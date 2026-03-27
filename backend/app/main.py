@@ -12,7 +12,7 @@ from app.config import settings
 from app.database import engine, Base
 from app.models import (
     User, FinancialProfile, RiskAssessment, Portfolio, PortfolioAllocation,
-    MonthlySnapshot, SIPRecord,
+    MonthlySnapshot, SIPRecord, AuditLog,
 )
 from app.middleware.logging_middleware import RequestLoggingMiddleware
 from app.middleware.error_handler import (
@@ -27,6 +27,7 @@ from app.routers import simulation, goals, sentiment, explainability, stocks
 from app.routers import chat, nudges, achievements, benchmark
 from app.routers import upload, instruments, bl_optimizer, spending, sip_tracker
 from app.routers import report, what_if, model_benchmark_router, rebalance, frontier, stress_test_router, tax, retirement, compounding
+from app.routers import gdpr
 
 # ── Logging ──────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -121,6 +122,7 @@ app.include_router(stress_test_router.router, prefix="/api/v1/stress-test", tags
 app.include_router(tax.router, prefix="/api/v1/tax", tags=["Tax"])
 app.include_router(retirement.router, prefix="/api/v1/retirement", tags=["Retirement"])
 app.include_router(compounding.router, prefix="/api/v1/compounding", tags=["Compounding"])
+app.include_router(gdpr.router, prefix="/api/v1/account", tags=["Account/GDPR"])
 
 
 # ── Health ───────────────────────────────────────────────────────────
