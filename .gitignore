@@ -1,0 +1,53 @@
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+.pytest_cache/
+htmlcov/
+.coverage
+test.db
+
+# Node
+node_modules/
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+pgdata/
+docker-compose.override.yml
+
+# Secrets / Credentials
+*.key
+*.pem
+*.p12
+credentials.json
+
+# Logs
+logs/
+*.log
+
+# ML models (large files)
+*.pkl
+*.joblib
+backend/app/ml_models/*.pkl
