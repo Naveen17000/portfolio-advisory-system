@@ -1,6 +1,6 @@
 # AI-Driven Investment Risk Profiling & Portfolio Advisory System
 
-An intelligent financial advisory platform that delivers highly personalized investment guidance by integrating behavioral intelligence, explainable AI, financial modeling, and real-time market insights. Built as a full-stack application with **30 interactive pages**, **50+ API endpoints**, **28 backend services**, and production-ready infrastructure.
+An intelligent financial advisory platform that delivers highly personalized investment guidance by integrating behavioral intelligence, explainable AI, financial modeling, and real-time market insights. Built as a full-stack application with **34 interactive pages**, **55+ API endpoints**, **29 backend services**, **22 components**, and production-ready infrastructure.
 
 ## Features
 
@@ -46,10 +46,22 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Debt Payoff Planner** - Client-side EMI calculator with amortization chart, extra payment impact analysis, interest savings visualization
 - **PDF Report Generation** - Downloadable HTML report with risk profile, financial summary, and portfolio allocation details
 - **Risk Score Timeline** - Area chart showing risk score changes over time with conservative/moderate/aggressive zone markers
+- **Portfolio Comparison** - Side-by-side comparison of current vs alternative portfolio allocations with pie charts and difference table
+- **Stock Watchlist** - Add/remove tickers, fetch live metrics (beta, volatility, Sharpe ratio, sector), localStorage persistence
+- **CSV Data Export** - Reusable CSV export utility for spending data, watchlist, portfolio allocations, and more
+- **Onboarding Welcome Flow** - 6-step animated feature tour for new users with progress dots and keyboard navigation
+- **Settings & Preferences** - Theme selection, notification toggles, currency preference, account management (password change, data export, account deletion)
+- **Command Palette** - `Ctrl+K` / `Cmd+K` search across all 34 pages with keyboard navigation, grouped by category
+- **Landing Page** - Public marketing page with hero, features grid, stats, how-it-works section
+- **GDPR Compliance** - Data export endpoint (Article 20 - portability), account deletion endpoint (Article 17 - right to erasure)
+- **Audit Logging** - Backend audit trail model tracking user actions (login, data export, account changes)
 
 ### Infrastructure & Quality
 - **Sidebar Navigation** - Grouped into 6 sections (Overview, Analysis, Planning, Market, Tracking, Account) with collapsible sidebar and mobile support
 - **Dark Mode** - Full dark theme with system preference detection, manual toggle, and localStorage persistence
+- **PWA Support** - Web app manifest for installability with theme colors
+- **Custom 404 Page** - Branded not-found page with navigation links
+- **SEO Metadata** - OpenGraph tags, keywords, viewport config, template titles per page
 - **Error Boundaries** - Next.js error.tsx with retry support, component-level ErrorBoundary wrapper
 - **Toast Notifications** - Global toast system (success/error/warning/info) with auto-dismiss
 - **Skeleton Loading** - Skeleton loaders replacing spinners across all pages
@@ -115,7 +127,7 @@ portfolio-advisory-system/
 │   │       ├── test_risk_engine.py
 │   │       └── test_portfolio_engine.py
 │   └── app/
-│       ├── main.py                 # App entry, lifespan, middleware, 28 routers
+│       ├── main.py                 # App entry, lifespan, middleware, 29 routers
 │       ├── config.py               # Environment settings (12 variables)
 │       ├── database.py             # Async SQLAlchemy engine & session
 │       ├── dependencies.py         # get_db, get_current_user (JWT)
@@ -125,16 +137,17 @@ portfolio-advisory-system/
 │       │   ├── error_handler.py        # Global exception handlers
 │       │   └── rate_limiter.py         # SlowAPI rate limiting
 │       │
-│       ├── models/                 # SQLAlchemy ORM models (5 files)
+│       ├── models/                 # SQLAlchemy ORM models (6 files)
 │       │   ├── user.py             # Users table
 │       │   ├── financial_profile.py # Financial profiles (JSONB fields)
 │       │   ├── risk_assessment.py  # Risk scores & sub-scores
 │       │   ├── portfolio.py        # Portfolios & allocations
-│       │   └── spending_history.py # Monthly snapshots & SIP records
+│       │   ├── spending_history.py # Monthly snapshots & SIP records
+│       │   └── audit_log.py        # Audit trail for user actions
 │       │
 │       ├── schemas/                # Pydantic request/response schemas (10 files)
 │       │
-│       ├── routers/                # API route handlers (28 routers)
+│       ├── routers/                # API route handlers (29 routers)
 │       │   ├── auth.py             # Register, login, refresh, me
 │       │   ├── profile.py          # Financial profile CRUD
 │       │   ├── questionnaire.py    # Adaptive questionnaire
@@ -162,9 +175,10 @@ portfolio-advisory-system/
 │       │   ├── stress_test_router.py # Stress testing
 │       │   ├── tax.py              # Tax planning (India)
 │       │   ├── retirement.py       # Retirement readiness
-│       │   └── compounding.py      # Compounding calculator
+│       │   ├── compounding.py      # Compounding calculator
+│       │   └── gdpr.py             # GDPR data export & account deletion
 │       │
-│       ├── services/               # Business logic (28 services)
+│       ├── services/               # Business logic (29 services)
 │       │   ├── auth_service.py     # Password hashing, JWT access + refresh tokens
 │       │   ├── profile_service.py  # Profile CRUD operations
 │       │   ├── questionnaire_service.py  # Question definitions
@@ -192,7 +206,8 @@ portfolio-advisory-system/
 │       │   ├── tax_planner.py      # Indian tax planning & 80C
 │       │   ├── retirement_planner.py  # Retirement readiness calculator
 │       │   ├── compounding_calc.py # Compounding & DCA calculator
-│       │   └── report_generator.py # HTML report generation
+│       │   ├── report_generator.py # HTML report generation
+│       │   └── audit_service.py   # Audit trail logging service
 │       │
 │       ├── utils/
 │       │   ├── constants.py        # Enums, weights, allocation matrices
@@ -200,7 +215,7 @@ portfolio-advisory-system/
 │       ├── ml_models/              # Trained model artifacts (.joblib)
 │       └── market_cache/           # Cached yfinance data (24h TTL)
 │
-└── frontend/                       # Next.js TypeScript frontend (30 pages)
+└── frontend/                       # Next.js TypeScript frontend (34 pages)
     ├── Dockerfile                  # Development Dockerfile
     ├── Dockerfile.prod             # Production multi-stage build (standalone)
     ├── .dockerignore
@@ -208,9 +223,11 @@ portfolio-advisory-system/
     ├── vitest.config.ts            # Vitest test configuration
     └── src/
         ├── app/                    # Next.js App Router pages
-        │   ├── layout.tsx          # Root layout (ThemeProvider, ToastProvider)
+        │   ├── layout.tsx          # Root layout (ThemeProvider, ToastProvider, CommandPalette)
         │   ├── error.tsx           # Global error boundary
+        │   ├── not-found.tsx       # Custom 404 page
         │   ├── loading.tsx         # Global loading skeleton
+        │   ├── page.tsx            # Public landing page
         │   ├── (auth)/login/       # Login with form validation
         │   ├── (auth)/register/    # Registration with form validation
         │   ├── dashboard/          # Main overview with charts
@@ -239,11 +256,15 @@ portfolio-advisory-system/
         │   ├── retirement/         # Retirement readiness calculator
         │   ├── calculator/         # Compounding & DCA calculator
         │   ├── debt/               # Debt payoff planner
-        │   └── report/             # Report preview & download
+        │   ├── report/             # Report preview & download
+        │   ├── welcome/            # Onboarding feature tour (6 steps)
+        │   ├── settings/           # User preferences & account management
+        │   ├── watchlist/           # Stock watchlist with live metrics
+        │   └── compare/            # Portfolio comparison (current vs alternative)
         │
         ├── components/
         │   ├── ui/                 # Button, Input, Card, Select, ProgressBar, Skeleton
-        │   ├── layout/             # AppShell, Sidebar, AuthGuard, ErrorBoundary, ThemeProvider, Toast
+        │   ├── layout/             # AppShell, Sidebar, AuthGuard, ErrorBoundary, ThemeProvider, Toast, CommandPalette
         │   ├── risk/               # RiskGauge, ScoreBreakdown, RiskCategoryBadge, RiskTimeline
         │   ├── portfolio/          # AllocationPieChart, AllocationTable, ReturnRangeCard
         │   └── simulation/         # FanChart
@@ -256,6 +277,7 @@ portfolio-advisory-system/
         ├── hooks/useAuth.ts        # Authentication state + token refresh
         ├── lib/api.ts              # Fetch wrapper with JWT auto-refresh
         ├── lib/constants.ts        # Asset class labels, colors, categories
+        ├── lib/export.ts           # CSV data export utility
         └── types/index.ts          # TypeScript interfaces
 ```
 
@@ -399,6 +421,12 @@ cd frontend && npm test
 | POST | `/api/v1/compounding/calculate` | Compounding & SIP growth calculator |
 | GET | `/api/v1/report/download` | Download portfolio advisory report |
 
+### Account & GDPR
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/account/export` | Export all user data (GDPR Article 20) |
+| DELETE | `/api/v1/account/delete-account` | Delete account & all data (GDPR Article 17) |
+
 ### System
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -487,13 +515,14 @@ Portfolio resilience is tested against 5 historical crisis scenarios:
 - [x] **Phase 2: Intelligence** - ML risk model, SHAP explainability, Monte Carlo simulation, goal-based planning, SIP tracking, spending history, FinBERT sentiment analysis, stock classification with real market data
 - [x] **Phase 3: Advanced** - Conversational AI chatbot, anomaly detection & nudge engine, gamification with achievements, peer benchmarking
 - [x] **Phase 4: Enhanced Analytics** - What-if analysis, model benchmarking, efficient frontier, rebalancing, stress testing, tax planning, retirement calculator, compounding calculator, debt payoff planner, report generation, sidebar navigation, dark mode, production infrastructure, CI/CD, comprehensive testing
+- [x] **Phase 5: Enterprise Features** - Command palette (Ctrl+K), stock watchlist, portfolio comparison, CSV export, onboarding flow, settings page, landing page, GDPR compliance (data export + account deletion), audit logging, PWA manifest, SEO metadata, custom 404 page
 
 ## System Architecture
 
 ```
-Frontend (Next.js 16)               →  30 pages, Recharts visualizations, dark mode
-        ↓                               Sidebar navigation, error boundaries, toast system
-API Gateway (FastAPI)               →  50+ endpoints, JWT auth + refresh, CORS, rate limiting
+Frontend (Next.js 16)               →  34 pages, Recharts visualizations, dark mode
+        ↓                               Sidebar nav, command palette, error boundaries, toast
+API Gateway (FastAPI)               →  55+ endpoints, JWT auth + refresh, CORS, rate limiting
         ↓                               Structured logging, Prometheus metrics
 Middleware Layer:
 ├── Request Logging                 →  Request ID tracking, timing
@@ -522,11 +551,13 @@ Service Layer (28 services):
 ├── Tax Planner                     →  Indian 80C/80D optimization
 ├── Retirement Planner              →  Corpus projection, glide path
 ├── Compounding Calculator          →  Lump sum + SIP + inflation
-└── Report Generator                →  HTML portfolio advisory report
+├── Report Generator                →  HTML portfolio advisory report
+├── Audit Service                   →  User action audit trail
+└── GDPR Handler                    →  Data export & account deletion
         ↓
 Data Layer:
-├── PostgreSQL 16                   →  7 tables (users, profiles, assessments,
-│                                       portfolios, allocations, snapshots, SIP records)
+├── PostgreSQL 16                   →  8 tables (users, profiles, assessments,
+│                                       portfolios, allocations, snapshots, SIP records, audit_logs)
 ├── Redis 7                         →  Rate limiting, caching, session store
 └── File Cache                      →  yfinance market data (24h TTL)
         ↓
