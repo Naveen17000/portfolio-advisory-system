@@ -19,7 +19,7 @@ describe('Card', () => {
   });
 
   it('applies custom className', () => {
-    render(<Card className="custom-class">Content</Card>);
+    render(<Card className="custom-class"><span>Content</span></Card>);
     expect(screen.getByText('Content').parentElement).toHaveClass('custom-class');
   });
 });

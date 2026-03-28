@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB as PG_JSONB
 
 from app.database import Base, get_db
 from app.main import app
+from app.middleware.rate_limiter import limiter
 
 
 # ---------------------------------------------------------------------------
@@ -47,6 +48,7 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 # ---------------------------------------------------------------------------
 @pytest_asyncio.fixture(autouse=True)
 async def setup_db():
+    limiter.enabled = False
     async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield

@@ -8,11 +8,20 @@ import ErrorBoundary from "@/components/layout/ErrorBoundary";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 
+interface Trend {
+  label: string;
+  status: string;
+  direction: string;
+}
+
 interface NudgeData {
   anomalies: { type: string; category: string; message: string; value?: number; threshold?: number }[];
-  nudges: { type: string; priority: string; category: string; message: string }[];
+  nudges: { type: string; priority: string; category: string; message: string; impact_score?: number }[];
   health_score: number;
   health_grade: string;
+  tone?: string;
+  micro_wins?: { type: string; category: string; message: string }[];
+  trends?: Record<string, Trend>;
   summary: {
     spending_ratio: number;
     savings_ratio: number;
@@ -98,6 +107,13 @@ export default function NudgesPage() {
               </span>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Health Grade</p>
               <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{data.health_score}/100</p>
+              {data.tone && (
+                <span className={`text-xs mt-1 px-2 py-0.5 rounded-full font-medium ${
+                  data.tone === "encouraging" ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300" :
+                  data.tone === "concerning" ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300" :
+                  "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300"
+                }`}>{data.tone}</span>
+              )}
             </Card>
             <Card>
               <p className="text-xs text-gray-500 dark:text-gray-400">Spending</p>
@@ -116,6 +132,48 @@ export default function NudgesPage() {
               <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{data.summary.emergency_months}mo</p>
             </Card>
           </div>
+
+          {/* Trends */}
+          {data.trends && (
+            <Card title="Financial Trends" className="mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {Object.entries(data.trends).map(([key, trend]) => {
+                  const statusColor: Record<string, string> = {
+                    excellent: "text-green-600 dark:text-green-400",
+                    healthy: "text-green-600 dark:text-green-400",
+                    fair: "text-yellow-600 dark:text-yellow-400",
+                    elevated: "text-orange-600 dark:text-orange-400",
+                    critical: "text-red-600 dark:text-red-400",
+                  };
+                  const arrow: Record<string, string> = { up: "\u2191", down: "\u2193", flat: "\u2192" };
+                  return (
+                    <div key={key} className="text-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 capitalize mb-1">{key.replace("_", " ")}</p>
+                      <span className={`text-lg font-bold ${statusColor[trend.status] || "text-gray-600"}`}>
+                        {arrow[trend.direction] || ""} {trend.status}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          )}
+
+          {/* Micro-Wins */}
+          {data.micro_wins && data.micro_wins.length > 0 && (
+            <Card title="What You're Doing Well" className="mb-6">
+              <div className="space-y-2" role="list" aria-label="Positive findings">
+                {data.micro_wins.map((w, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-green-50 dark:bg-green-900/20" role="listitem">
+                    <span className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white bg-green-500" aria-hidden="true">
+                      &#10003;
+                    </span>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">{w.message}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* Anomalies */}
           {data.anomalies.length > 0 && (
@@ -151,6 +209,9 @@ export default function NudgesPage() {
                       {n.priority}
                     </span>
                     <span className="text-xs text-gray-400 dark:text-gray-500 capitalize">{n.category.replace("_", " ")}</span>
+                    {n.impact_score != null && (
+                      <span className="ml-auto text-xs text-gray-400 dark:text-gray-500 font-mono">impact: {n.impact_score}/100</span>
+                    )}
                   </div>
                   <p className="text-sm text-gray-700 dark:text-gray-300">{n.message}</p>
                 </div>

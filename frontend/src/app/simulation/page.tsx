@@ -17,6 +17,9 @@ interface SimulationResult {
     years: number;
     portfolio_expected_return: number;
     portfolio_volatility: number;
+    model?: string;
+    distribution?: string;
+    degrees_of_freedom?: number;
   };
   total_invested: number;
   yearly_data: { year: number; p5: number; p25: number; p50: number; p75: number; p95: number }[];
@@ -32,6 +35,12 @@ interface SimulationResult {
     expected: number;
     optimistic: number;
     best_case: number;
+  };
+  regime_analysis?: {
+    bull_months_pct: number;
+    bear_months_pct: number;
+    avg_bull_duration_months: number;
+    avg_bear_duration_months: number;
   };
 }
 
@@ -149,7 +158,7 @@ export default function SimulationPage() {
                 </div>
               </Card>
 
-              <div className="grid grid-cols-2 gap-4 mt-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
                 <Card>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Expected Annual Return</p>
                   <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{result.parameters.portfolio_expected_return}%</p>
@@ -158,7 +167,58 @@ export default function SimulationPage() {
                   <p className="text-xs text-gray-500 dark:text-gray-400">Portfolio Volatility</p>
                   <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{result.parameters.portfolio_volatility}%</p>
                 </Card>
+                <Card>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Distribution Model</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-gray-100 capitalize">{result.parameters.distribution || "normal"}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{result.parameters.degrees_of_freedom ? `df = ${result.parameters.degrees_of_freedom}` : ""}</p>
+                </Card>
+                <Card>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Simulation Model</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                    {result.parameters.model === "fat_tailed_regime_switching" ? "Fat-Tail + Regime" : "Standard"}
+                  </p>
+                </Card>
               </div>
+
+              {result.regime_analysis && (
+                <Card title="Market Regime Analysis" className="mt-6">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    Simulations model bull/bear market cycles using Markov chain regime switching
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Bull Market</p>
+                      <p className="text-xl font-bold text-green-600 dark:text-green-400">{result.regime_analysis.bull_months_pct}%</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">of months</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Bear Market</p>
+                      <p className="text-xl font-bold text-red-600 dark:text-red-400">{result.regime_analysis.bear_months_pct}%</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">of months</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Avg Bull Run</p>
+                      <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{result.regime_analysis.avg_bull_duration_months}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">months</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Avg Bear Run</p>
+                      <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{result.regime_analysis.avg_bear_duration_months}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">months</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                    <div
+                      className="h-full bg-green-500 rounded-l-full"
+                      style={{ width: `${result.regime_analysis.bull_months_pct}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    <span>Bull ({result.regime_analysis.bull_months_pct}%)</span>
+                    <span>Bear ({result.regime_analysis.bear_months_pct}%)</span>
+                  </div>
+                </Card>
+              )}
             </>
           )}
         </div>

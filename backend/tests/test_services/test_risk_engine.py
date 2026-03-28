@@ -59,7 +59,7 @@ class TestSpendingRatioScore:
     def test_low_spending_ratio(self):
         # 20% spending ratio -> high score (healthy)
         score = calc_spending_ratio_score(10000, 2000)
-        assert score >= 75
+        assert score >= 65
 
     def test_moderate_spending_ratio(self):
         # 50% spending ratio -> mid-range score

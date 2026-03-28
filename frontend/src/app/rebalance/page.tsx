@@ -17,20 +17,30 @@ const ASSET_CLASSES = [
   "international",
 ];
 
-interface RebalanceAction {
+interface RebalanceTrade {
   asset_class: string;
   current_pct: number;
   target_pct: number;
   drift_pct: number;
+  drift_amount: number;
   action: "buy" | "sell" | "hold";
-  amount: number;
+  tax_impact?: string;
+  tax_note?: string;
+  priority_score?: number;
 }
 
 interface RebalanceResult {
-  actions: RebalanceAction[];
-  total_drift: number;
+  trades: RebalanceTrade[];
+  total_drift_pct: number;
+  needs_rebalancing: boolean;
+  urgency?: string;
   recommendation: string;
   portfolio_value: number;
+  rebalance_schedule?: {
+    rebalance_frequency: string;
+    next_rebalance_date: string;
+    schedule_note: string;
+  };
 }
 
 function getActionColor(action: string): string {
@@ -77,11 +87,9 @@ export default function RebalancePage() {
     setLoading(true);
     setError("");
     try {
-      const current_allocations: Record<string, number> = {};
-      for (const [k, v] of Object.entries(allocations)) {
-        const num = Number(v);
-        if (num > 0) current_allocations[k] = num / 100;
-      }
+      const current_allocations = Object.entries(allocations)
+        .filter(([, v]) => Number(v) > 0)
+        .map(([k, v]) => ({ asset_class: k, current_pct: Number(v) }));
       const res = await api<RebalanceResult>("/api/v1/rebalance/analyze", {
         method: "POST",
         body: JSON.stringify({
@@ -171,22 +179,30 @@ export default function RebalancePage() {
         {result && (
           <>
             {/* Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
               <Card>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Total Drift
                 </p>
                 <p
                   className={`text-2xl font-bold ${
-                    result.total_drift > 10
+                    result.total_drift_pct > 10
                       ? "text-red-600 dark:text-red-400"
-                      : result.total_drift > 5
+                      : result.total_drift_pct > 5
                       ? "text-orange-600 dark:text-orange-400"
                       : "text-green-600 dark:text-green-400"
                   }`}
                 >
-                  {result.total_drift.toFixed(1)}%
+                  {result.total_drift_pct.toFixed(1)}%
                 </p>
+                {result.urgency && (
+                  <span className={`inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full uppercase ${
+                    result.urgency === "urgent" ? "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300" :
+                    result.urgency === "recommended" ? "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300" :
+                    result.urgency === "monitor" ? "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300" :
+                    "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300"
+                  }`}>{result.urgency}</span>
+                )}
               </Card>
               <Card>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -196,6 +212,22 @@ export default function RebalancePage() {
                   {result.recommendation}
                 </p>
               </Card>
+              {result.rebalance_schedule && (
+                <Card>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Rebalancing Schedule
+                  </p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-gray-100 capitalize mt-1">
+                    {result.rebalance_schedule.rebalance_frequency}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Next: {result.rebalance_schedule.next_rebalance_date}
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    {result.rebalance_schedule.schedule_note}
+                  </p>
+                </Card>
+              )}
             </div>
 
             {/* Rebalancing Actions Table */}
@@ -208,13 +240,13 @@ export default function RebalancePage() {
                         Asset Class
                       </th>
                       <th className="text-right py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
-                        Current %
+                        Current
                       </th>
                       <th className="text-right py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
-                        Target %
+                        Target
                       </th>
                       <th className="text-right py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
-                        Drift %
+                        Drift
                       </th>
                       <th className="text-right py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
                         Amount
@@ -222,10 +254,16 @@ export default function RebalancePage() {
                       <th className="text-center py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
                         Action
                       </th>
+                      <th className="text-center py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
+                        Tax
+                      </th>
+                      <th className="text-right py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
+                        Priority
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {result.actions.map((row) => (
+                    {result.trades.map((row) => (
                       <tr
                         key={row.asset_class}
                         className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30"
@@ -234,10 +272,10 @@ export default function RebalancePage() {
                           {row.asset_class.replace(/_/g, " ")}
                         </td>
                         <td className="py-3 px-2 text-right text-gray-700 dark:text-gray-300">
-                          {(row.current_pct * 100).toFixed(1)}%
+                          {row.current_pct.toFixed(1)}%
                         </td>
                         <td className="py-3 px-2 text-right text-gray-700 dark:text-gray-300">
-                          {(row.target_pct * 100).toFixed(1)}%
+                          {row.target_pct.toFixed(1)}%
                         </td>
                         <td
                           className={`py-3 px-2 text-right font-medium ${
@@ -249,10 +287,10 @@ export default function RebalancePage() {
                           }`}
                         >
                           {row.drift_pct > 0 ? "+" : ""}
-                          {(row.drift_pct * 100).toFixed(1)}%
+                          {row.drift_pct.toFixed(1)}%
                         </td>
                         <td className="py-3 px-2 text-right text-gray-700 dark:text-gray-300">
-                          {fmt(Math.abs(row.amount))}
+                          {fmt(Math.abs(row.drift_amount))}
                         </td>
                         <td className="py-3 px-2 text-center">
                           <span
@@ -260,6 +298,27 @@ export default function RebalancePage() {
                           >
                             {row.action}
                           </span>
+                        </td>
+                        <td className="py-3 px-2 text-center">
+                          {row.tax_impact && (
+                            <span
+                              className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+                                row.tax_impact === "high" ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300" :
+                                row.tax_impact === "medium" ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300" :
+                                "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                              }`}
+                              title={row.tax_note}
+                            >
+                              {row.tax_impact}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-2 text-right">
+                          {row.priority_score != null && (
+                            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+                              {row.priority_score}
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}

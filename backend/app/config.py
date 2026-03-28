@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_DEFAULT: str = "200/minute"
     RATE_LIMIT_AUTH: str = "10/minute"
     ENVIRONMENT: str = "development"
+    GEMINI_API_KEY: str = ""
 
     class Config:
         env_file = ".env"

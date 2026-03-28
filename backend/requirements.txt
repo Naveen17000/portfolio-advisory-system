@@ -39,3 +39,6 @@ feedparser==6.0.11
 
 # Phase 2: Market Data
 yfinance==0.2.44
+
+# Phase 3: AI Chatbot
+google-generativeai==0.8.3

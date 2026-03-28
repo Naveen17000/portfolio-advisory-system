@@ -19,7 +19,7 @@ An intelligent financial advisory platform that delivers highly personalized inv
 ### Phase 2 - Intelligence Layer
 - **ML Risk Model** - Gradient Boosting regressor trained on 5,000 synthetic behavioral finance profiles using Prospect Theory and interaction effects; blended 60/40 with rule-based engine
 - **Explainable AI (SHAP)** - TreeExplainer-based feature contribution analysis with human-readable insights for each risk factor
-- **Monte Carlo Simulation** - 1,000-path simulation engine with fan chart visualization, 5 scenario outcomes (worst/pessimistic/expected/optimistic/best), probability metrics; uses real historical data from yfinance when available
+- **Monte Carlo Simulation (Fat-Tail + Regime Switching)** - 1,000-path simulation engine using Student-t distribution (df=5) for fat tails and Markov chain regime switching (bull/bear market cycles). Fan chart visualization, 5 scenario outcomes, probability metrics, regime analysis (bull/bear duration and frequency). Uses real historical data from yfinance when available
 - **Goal-Based Planning** - 7 goal templates (emergency fund, education, home, car, vacation, retirement, wealth building) with SIP calculators and 4 SIP scenarios per goal
 - **SIP Adherence Tracking** - Log actual SIP contributions per goal, track adherence percentage, detect missed months, monthly contribution history
 - **Market Sentiment Analysis** - FinBERT (ProsusAI) NLP pipeline analyzing financial news RSS feeds with sector-wise sentiment scoring (8 sectors)
@@ -28,8 +28,8 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Real Market Data** - yfinance integration for historical returns, volatility, and asset class statistics with 24-hour disk caching
 
 ### Phase 3 - Advanced Features
-- **Conversational AI Assistant** - Context-aware chatbot with 12+ investment topic knowledge base (SIP, mutual funds, stocks, debt, gold, tax, retirement, risk, diversification, inflation, compounding, emergency fund), personalized responses based on user's risk profile and life stage
-- **Anomaly Detection & Nudge Engine** - Detects 6 types of financial anomalies (overspending, low savings, inadequate emergency fund, high debt, dependent risk, horizon mismatch), generates prioritized action items with specific monthly targets, and assigns a health grade (A-F)
+- **Conversational AI Assistant (Gemini LLM)** - Google Gemini 2.5 Flash-powered chatbot with full financial context injection (risk score, life stage, income, savings, investment horizon). Provides personalized, conversational investment guidance in English/Hinglish with Indian financial context (80C, ELSS, NPS, PPF, SGB). Falls back to rule-based 12-topic knowledge base if API is unavailable
+- **Anomaly Detection & Behavioral Nudge Engine** - Detects 10 types of financial anomalies including behavioral patterns (lifestyle inflation, cash hoarding, over-concentration, insurance gap), generates impact-scored nudges (0-100) with smart prioritization, micro-wins for positive reinforcement, trend indicators per metric, and overall tone classification (encouraging/mixed/concerning). Health grade A-F
 - **Gamification** - 16 achievements across 6 categories (savings milestones, emergency fund, debt management, diversification, experience, discipline) with a 6-level progression system (Beginner to Master Investor)
 - **Peer Benchmarking** - Anonymized comparison against life-stage cohorts across 6 metrics (savings rate, spending ratio, emergency fund, debt-to-income, risk score, investment diversity) with percentile rankings and cohort allocation benchmarks
 
@@ -38,7 +38,7 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Model Benchmarking** - Side-by-side comparison of ML vs rule-based scoring across benchmark profiles, with agreement metrics, feature importance charts, and model info
 - **Efficient Frontier Visualization** - 500-portfolio Monte Carlo frontier with optimal (max Sharpe) and minimum variance portfolios highlighted, plus individual asset class risk-return plot
 - **Asset Correlation Heatmap** - Color-coded 6x6 matrix showing inter-asset-class correlations for diversification analysis
-- **Portfolio Rebalancing** - Drift detection with buy/sell/hold recommendations based on current vs target allocations
+- **Dynamic Portfolio Rebalancing** - Drift detection with threshold-based urgency levels (none/monitor/recommended/urgent), tax-aware trade suggestions (LTCG/STCG impact per asset class), priority scoring (0-100) per trade, and calendar-based rebalancing schedule (monthly/quarterly/annual)
 - **Stress Testing** - Portfolio impact analysis across 5 historical crisis scenarios (2008 GFC, COVID-19, Taper Tantrum, Rate Hike Cycle, Stagflation) with asset-level breakdown
 - **Tax Planning (India)** - New regime tax calculator with Section 80C/80D utilization tracking, slab-wise breakdown, and tax-saving instrument recommendations (ELSS, PPF, NPS, etc.)
 - **Retirement Readiness Calculator** - Corpus projection, readiness gauge (A-F grade), glide path visualization, safe withdrawal rate analysis, additional SIP shortfall calculator
@@ -88,6 +88,7 @@ An intelligent financial advisory platform that delivers highly personalized inv
 | Database | PostgreSQL 16, Redis 7 |
 | Auth | JWT access + refresh tokens (python-jose, passlib/bcrypt) |
 | ML & Analytics | scikit-learn, SHAP, NumPy, Pandas, SciPy |
+| AI Chatbot | Google Gemini 2.5 Flash (free tier via Google AI Studio) |
 | NLP | FinBERT via HuggingFace Transformers, PyTorch (CPU), feedparser |
 | Market Data | yfinance (Yahoo Finance, no API key required) |
 | Monitoring | Prometheus client, structured logging, SlowAPI rate limiting |
@@ -194,7 +195,7 @@ portfolio-advisory-system/
 │       │   ├── market_data.py      # yfinance data fetcher & cache
 │       │   ├── stock_classifier.py # Stock risk classification
 │       │   ├── shap_explainer.py   # SHAP feature explanations
-│       │   ├── chatbot.py          # Conversational AI engine
+���       │   ├── chatbot.py          # Gemini LLM chatbot + rule-based fallback
 │       │   ├── anomaly_detector.py # Financial anomaly detection
 │       │   ├── gamification.py     # Achievement & leveling system
 │       │   ├── peer_benchmark.py   # Cohort comparison engine
@@ -507,6 +508,7 @@ Portfolio resilience is tested against 5 historical crisis scenarios:
 | `RATE_LIMIT_DEFAULT` | `200/minute` | Default API rate limit |
 | `RATE_LIMIT_AUTH` | `10/minute` | Auth endpoint rate limit |
 | `ENVIRONMENT` | `development` | Environment name |
+| `GEMINI_API_KEY` | *(empty)* | Google AI Studio API key for AI chatbot |
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend URL for frontend |
 
 ## Development Roadmap
@@ -534,18 +536,18 @@ Service Layer (28 services):
 ├── Data Collection                 →  Questionnaire, CSV parser
 ├── Risk Profiling Engine           →  Rule-based + ML hybrid scoring
 ├── Portfolio Optimization          →  MPT + Black-Litterman + instruments
-├── Simulation Engine               →  Monte Carlo (1,000 paths)
+├── Simulation Engine               →  Monte Carlo (fat-tail + regime switching)
 ├── Goal Planning Service           →  SIP calculator, adherence tracking
 ├── Sentiment Analyzer              →  FinBERT NLP on RSS feeds
 ├── Stock Classification            →  Real-time yfinance metrics
 ├── Spending Tracker                →  Monthly snapshots, trends
-├── Conversational AI               →  12+ topic knowledge base
-├── Anomaly Detection               →  6 anomaly types, health scoring
+├── Conversational AI               →  Gemini 2.5 Flash LLM + rule-based fallback
+├── Anomaly Detection               →  10 anomaly types, behavioral nudges, micro-wins
 ├── Gamification Service            →  16 achievements, 6 levels
 ├── Benchmarking Service            →  Cohort comparison, percentiles
 ├── What-If Engine                  →  Scenario analysis with modified params
 ├── Model Benchmarking              →  ML vs rule-based comparison
-├── Rebalancing Engine              →  Portfolio drift & trade suggestions
+├── Rebalancing Engine              →  Tax-aware drift analysis, urgency triggers, scheduling
 ├── Efficient Frontier              →  500-portfolio simulation, correlation matrix
 ├── Stress Test Engine              →  5 crisis scenarios
 ├── Tax Planner                     →  Indian 80C/80D optimization
