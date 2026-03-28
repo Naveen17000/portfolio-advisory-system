@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 
@@ -43,7 +41,7 @@ export default function AchievementsPage() {
 
   if (loading) {
     return (
-      <AuthGuard><Navbar />
+      <AppShell>
         <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-8" role="main" aria-label="Loading achievements">
           <div className="space-y-6">
             <CardSkeleton />
@@ -55,24 +53,22 @@ export default function AchievementsPage() {
             </div>
           </div>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   if (!data) {
     return (
-      <AuthGuard><Navbar />
+      <AppShell>
         <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400" role="main">
           Complete your profile to unlock achievements.
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-8" role="main" aria-label="Achievements">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Achievements</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-6">Track your financial milestones and level up</p>
@@ -146,7 +142,6 @@ export default function AchievementsPage() {
             </div>
           )}
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

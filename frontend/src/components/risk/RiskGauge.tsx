@@ -17,7 +17,7 @@ export default function RiskGauge({ score, category }: RiskGaugeProps) {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="w-52 h-28 relative">
+      <div className="w-52 h-28 relative overflow-hidden" style={{ minHeight: 0 }}>
         <ResponsiveContainer width="100%" height="100%">
           <RadialBarChart
             cx="50%"

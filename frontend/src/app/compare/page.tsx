@@ -90,6 +90,7 @@ function AllocationPie({
 
   return (
     <Card title={title}>
+      <div className="overflow-hidden" style={{ minHeight: 0 }}>
       <ResponsiveContainer width="100%" height={280}>
         <PieChart>
           <Pie
@@ -121,6 +122,7 @@ function AllocationPie({
           <Legend />
         </PieChart>
       </ResponsiveContainer>
+      </div>
     </Card>
   );
 }

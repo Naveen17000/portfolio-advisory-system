@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -78,9 +76,7 @@ export default function SimulationPage() {
   };
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Monte Carlo Simulation">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Monte Carlo Simulation</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8">Simulate thousands of possible portfolio outcomes based on your allocation</p>
@@ -222,7 +218,6 @@ export default function SimulationPage() {
             </>
           )}
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

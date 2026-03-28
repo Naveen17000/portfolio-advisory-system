@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -46,4 +47,4 @@ async def get_recommendations(
         for a in portfolio.allocations
     ]
 
-    return get_instrument_recommendations(allocations, risk_category)
+    return await asyncio.to_thread(get_instrument_recommendations, allocations, risk_category)

@@ -30,7 +30,7 @@ function formatCurrency(value: number): string {
 
 export default function FanChart({ yearlyData }: FanChartProps) {
   return (
-    <div className="w-full h-72 sm:h-80" role="img" aria-label="Portfolio projection fan chart showing percentile ranges over time">
+    <div className="w-full h-72 sm:h-80 overflow-hidden" style={{ minHeight: 0 }} role="img" aria-label="Portfolio projection fan chart showing percentile ranges over time">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={yearlyData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" opacity={0.3} className="dark:opacity-20" />

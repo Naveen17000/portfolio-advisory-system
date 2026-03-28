@@ -307,6 +307,7 @@ export default function RetirementPage() {
             {/* Glide Path Chart */}
             {chartData && chartData.length > 0 && (
               <Card title="Corpus Growth & Asset Allocation Glide Path">
+                <div className="overflow-hidden" style={{ minHeight: 0 }}>
                 <ResponsiveContainer width="100%" height={400}>
                   <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
@@ -381,6 +382,7 @@ export default function RetirementPage() {
                     />
                   </LineChart>
                 </ResponsiveContainer>
+                </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-center">
                   Solid line shows corpus growth. Dashed lines show equity/debt allocation shift over time.
                 </p>

@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -59,7 +57,7 @@ export default function SpendingPage() {
 
   if (loading) {
     return (
-      <AuthGuard><Navbar />
+      <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Loading spending tracker">
           <div className="space-y-6">
             <CardSkeleton />
@@ -72,14 +70,12 @@ export default function SpendingPage() {
             <CardSkeleton />
           </div>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Spending tracker">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -139,7 +135,7 @@ export default function SpendingPage() {
 
               {/* Chart */}
               <Card title="Monthly Trend" className="mb-6">
-                <div className="w-full h-72 overflow-x-auto" aria-label="Monthly spending chart">
+                <div className="w-full h-72 overflow-hidden" style={{ minHeight: 0 }} aria-label="Monthly spending chart">
                   <ResponsiveContainer width="100%" height="100%" minWidth={400}>
                     <BarChart data={data.history} margin={{ left: 0, right: 10 }}>
                       <XAxis dataKey="month" tick={{ fontSize: 10 }} />
@@ -162,7 +158,6 @@ export default function SpendingPage() {
             </Card>
           )}
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

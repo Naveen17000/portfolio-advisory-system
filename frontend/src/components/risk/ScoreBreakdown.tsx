@@ -36,7 +36,7 @@ export default function ScoreBreakdown({ scores }: ScoreBreakdownProps) {
 
   return (
     <div className="w-full" role="img" aria-label="Score breakdown chart">
-      <div className="w-full h-56">
+      <div className="w-full h-56 overflow-hidden" style={{ minHeight: 0 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11, fill: "#9ca3af" }} />

@@ -6,12 +6,27 @@ Caches results to avoid excessive API calls.
 
 import json
 import time
+import signal
 from pathlib import Path
 from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
 import yfinance as yf
+
+
+class _Timeout:
+    """Context manager for timing out synchronous yfinance calls."""
+    def __init__(self, seconds=10):
+        self.seconds = seconds
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self._handler)
+        signal.alarm(self.seconds)
+        return self
+    def __exit__(self, *args):
+        signal.alarm(0)
+    def _handler(self, signum, frame):
+        raise TimeoutError("yfinance call timed out")
 
 CACHE_DIR = Path(__file__).parent.parent / "market_cache"
 CACHE_TTL = 86400  # 24 hours
@@ -104,7 +119,8 @@ def fetch_historical_data(ticker: str, period: str = "2y") -> pd.DataFrame | Non
         return pd.DataFrame(cached)
 
     try:
-        data = yf.download(ticker, period=period, progress=False, auto_adjust=True)
+        with _Timeout(8):
+            data = yf.download(ticker, period=period, progress=False, auto_adjust=True)
         if data.empty:
             return None
         # Flatten MultiIndex columns if present
@@ -114,7 +130,7 @@ def fetch_historical_data(ticker: str, period: str = "2y") -> pd.DataFrame | Non
         result.index = result.index.strftime("%Y-%m-%d")
         _save_cache(cache_key, result.to_dict())
         return result
-    except Exception:
+    except (Exception, TimeoutError):
         return None
 
 
@@ -168,7 +184,8 @@ def compute_stock_metrics(ticker: str, benchmark_ticker: str = "^NSEI", period: 
         max_drawdown = float(drawdown.min()) * 100
 
         # Get stock info
-        info = yf.Ticker(ticker).info
+        with _Timeout(5):
+            info = yf.Ticker(ticker).info
         market_cap = info.get("marketCap", 0)
         name = info.get("shortName", ticker.replace(".NS", ""))
         sector = info.get("sector", "Unknown")

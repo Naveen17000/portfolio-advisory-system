@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import type { Portfolio } from "@/types";
-import AuthGuard from "@/components/layout/AuthGuard";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
-import Navbar from "@/components/layout/Navbar";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 import AllocationPieChart from "@/components/portfolio/AllocationPieChart";
@@ -24,9 +22,7 @@ export default function PortfolioPage() {
   }, []);
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Portfolio Recommendation</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8">Your personalized asset allocation based on your risk profile</p>
@@ -68,7 +64,6 @@ export default function PortfolioPage() {
             </>
           )}
         </main>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,7 +34,8 @@ async def simulate(
 
     allocations = {a.asset_class: float(a.allocation_pct) for a in portfolio.allocations}
 
-    sim_result = run_simulation(
+    sim_result = await asyncio.to_thread(
+        run_simulation,
         allocations=allocations,
         initial_investment=data.initial_investment,
         monthly_sip=data.monthly_sip,

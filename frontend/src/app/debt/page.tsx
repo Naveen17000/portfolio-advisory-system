@@ -363,6 +363,7 @@ export default function DebtPage() {
             {/* Amortization Chart */}
             {chartData.length > 0 && (
               <Card title="Amortization Timeline">
+                <div className="overflow-hidden" style={{ minHeight: 0 }}>
                 <ResponsiveContainer width="100%" height={400}>
                   <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
                     <defs>
@@ -452,6 +453,7 @@ export default function DebtPage() {
                     )}
                   </AreaChart>
                 </ResponsiveContainer>
+                </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-center">
                   Cumulative principal and interest paid over time.
                   {extraResult && " Dashed lines show the accelerated payoff with extra payments."}

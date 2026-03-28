@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -96,9 +94,7 @@ export default function GoalsPage() {
   };
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Goal-based planning">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Goal-Based Planning</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8">Define your financial goals and get a personalized investment strategy</p>
@@ -214,7 +210,6 @@ export default function GoalsPage() {
             </>
           )}
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
+import AppShell from "@/components/layout/AppShell";
 import Button from "@/components/ui/Button";
 
 interface Message {
@@ -162,8 +161,7 @@ export default function ChatPage() {
   };
 
   return (
-    <AuthGuard>
-      <Navbar />
+    <AppShell>
       <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4" role="log" aria-label="Chat messages" aria-live="polite">
@@ -239,6 +237,6 @@ export default function ChatPage() {
           </p>
         </div>
       </div>
-    </AuthGuard>
+    </AppShell>
   );
 }

@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 
@@ -63,7 +61,7 @@ export default function NudgesPage() {
 
   if (loading) {
     return (
-      <AuthGuard><Navbar />
+      <AppShell>
         <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-8" role="main" aria-label="Loading financial health check">
           <div className="space-y-6">
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
@@ -77,24 +75,22 @@ export default function NudgesPage() {
             <CardSkeleton />
           </div>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   if (!data) {
     return (
-      <AuthGuard><Navbar />
+      <AppShell>
         <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400" role="main">
           Complete your financial profile to get personalized nudges.
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-8" role="main" aria-label="Financial health check">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Financial Health Check</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-6">Personalized alerts and actionable nudges based on your financial profile</p>
@@ -224,7 +220,6 @@ export default function NudgesPage() {
             </div>
           </Card>
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

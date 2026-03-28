@@ -199,6 +199,7 @@ export default function CalculatorPage() {
             {/* Area Chart: Invested vs Value Growth */}
             {chartData && (
               <Card title="Investment Growth Over Time">
+                <div className="overflow-hidden" style={{ minHeight: 0 }}>
                 <ResponsiveContainer width="100%" height={400}>
                   <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
                     <defs>
@@ -263,12 +264,14 @@ export default function CalculatorPage() {
                     />
                   </AreaChart>
                 </ResponsiveContainer>
+                </div>
               </Card>
             )}
 
             {/* Inflation-adjusted line */}
             {chartData && (
               <Card title="Inflation-Adjusted (Real) Value">
+                <div className="overflow-hidden" style={{ minHeight: 0 }}>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
@@ -323,6 +326,7 @@ export default function CalculatorPage() {
                     />
                   </LineChart>
                 </ResponsiveContainer>
+                </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 text-center">
                   Real value adjusted for {form.inflation_rate}% annual inflation
                 </p>

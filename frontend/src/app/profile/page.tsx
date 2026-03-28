@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import type { FinancialProfile } from "@/types";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -93,8 +91,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <AuthGuard>
-        <Navbar />
+      <AppShell>
         <div className="flex-1 max-w-3xl mx-auto w-full px-4 py-8" role="main" aria-label="Loading profile">
           <div className="space-y-6">
             <CardSkeleton />
@@ -102,26 +99,23 @@ export default function ProfilePage() {
             <CardSkeleton />
           </div>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   if (!profile) {
     return (
-      <AuthGuard>
-        <Navbar />
+      <AppShell>
         <div className="flex-1 flex flex-col items-center justify-center gap-4" role="main">
           <p className="text-gray-500 dark:text-gray-400">No financial profile found.</p>
           <Button onClick={() => router.push("/questionnaire")}>Complete Questionnaire</Button>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-3xl mx-auto w-full px-4 py-8" role="main" aria-label="Financial profile">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Financial Profile</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8">Review and update your financial information</p>
@@ -220,7 +214,6 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

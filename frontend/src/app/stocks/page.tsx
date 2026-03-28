@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { CardSkeleton } from "@/components/ui/Skeleton";
@@ -128,9 +126,7 @@ export default function StocksPage() {
   };
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-6xl mx-auto w-full px-4 py-8" role="main" aria-label="Stock classification">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Stock Classification</h1>
@@ -212,7 +208,6 @@ export default function StocksPage() {
             </Card>
           )}
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

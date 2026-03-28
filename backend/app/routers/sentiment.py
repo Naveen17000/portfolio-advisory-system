@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, Query
 
 from app.dependencies import get_current_user
@@ -13,4 +14,4 @@ async def sentiment(
     category: str = Query("general", description="News category: general, equity, commodities"),
     user: User = Depends(get_current_user),
 ):
-    return get_market_sentiment(category)
+    return await asyncio.to_thread(get_market_sentiment, category)

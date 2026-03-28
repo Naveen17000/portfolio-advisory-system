@@ -315,6 +315,7 @@ export default function WhatIfPage() {
 
             {/* Allocation Comparison */}
             <Card title="Portfolio Allocation Comparison" className="mt-6">
+              <div className="overflow-hidden" style={{ minHeight: 0 }}>
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={allocationChartData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -345,6 +346,7 @@ export default function WhatIfPage() {
                   <Bar dataKey="Modified" fill="#10B981" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             </Card>
           </>
         )}

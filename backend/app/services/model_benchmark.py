@@ -10,9 +10,9 @@ logger = logging.getLogger("portfolio_api")
 # Representative test profiles for benchmarking
 BENCHMARK_PROFILES = [
     {"label": "Conservative Student", "monthly_income": 15000, "monthly_expenses": 12000, "monthly_savings": 3000, "total_liabilities": 0, "emergency_fund_months": 1, "existing_investments": {}, "dependents_count": 0, "investment_horizon_years": 3, "life_stage": "student", "investment_experience": "none", "loss_tolerance": "low"},
-    {"label": "Moderate Early Career", "monthly_income": 60000, "monthly_expenses": 35000, "monthly_savings": 25000, "total_liabilities": 200000, "emergency_fund_months": 4, "existing_investments": {"mutual_funds": True, "fd": True}, "dependents_count": 0, "investment_horizon_years": 15, "life_stage": "early_career", "investment_experience": "beginner", "loss_tolerance": "medium"},
+    {"label": "Moderate Early Career", "monthly_income": 60000, "monthly_expenses": 35000, "monthly_savings": 25000, "total_liabilities": 200000, "emergency_fund_months": 4, "existing_investments": {"mutual_funds": True, "fd": True}, "dependents_count": 0, "investment_horizon_years": 15, "life_stage": "early_career", "investment_experience": "beginner", "loss_tolerance": "moderate"},
     {"label": "Aggressive Investor", "monthly_income": 150000, "monthly_expenses": 60000, "monthly_savings": 90000, "total_liabilities": 0, "emergency_fund_months": 12, "existing_investments": {"stocks": True, "mutual_funds": True, "crypto": True}, "dependents_count": 0, "investment_horizon_years": 25, "life_stage": "early_career", "investment_experience": "advanced", "loss_tolerance": "high"},
-    {"label": "Family Provider", "monthly_income": 100000, "monthly_expenses": 70000, "monthly_savings": 30000, "total_liabilities": 3000000, "emergency_fund_months": 6, "existing_investments": {"mutual_funds": True, "ppf": True}, "dependents_count": 2, "investment_horizon_years": 10, "life_stage": "family", "investment_experience": "intermediate", "loss_tolerance": "medium"},
+    {"label": "Family Provider", "monthly_income": 100000, "monthly_expenses": 70000, "monthly_savings": 30000, "total_liabilities": 3000000, "emergency_fund_months": 6, "existing_investments": {"mutual_funds": True, "ppf": True}, "dependents_count": 2, "investment_horizon_years": 10, "life_stage": "family", "investment_experience": "intermediate", "loss_tolerance": "moderate"},
     {"label": "Pre-Retirement", "monthly_income": 200000, "monthly_expenses": 80000, "monthly_savings": 120000, "total_liabilities": 500000, "emergency_fund_months": 18, "existing_investments": {"fd": True, "ppf": True, "mutual_funds": True, "real_estate": True}, "dependents_count": 1, "investment_horizon_years": 5, "life_stage": "pre_retirement", "investment_experience": "advanced", "loss_tolerance": "low"},
 ]
 
@@ -28,8 +28,9 @@ def run_benchmark() -> dict:
     results = []
 
     for profile_data in BENCHMARK_PROFILES:
-        label = profile_data.pop("label")
-        mock = MockProfile(profile_data)
+        label = profile_data["label"]
+        data = {k: v for k, v in profile_data.items() if k != "label"}
+        mock = MockProfile(data)
 
         # Rule-based score
         rule_result = assess_risk(mock)
@@ -37,7 +38,7 @@ def run_benchmark() -> dict:
 
         # ML score
         try:
-            ml_score = predict_risk_score(profile_data)
+            ml_score = predict_risk_score(data)
         except Exception:
             ml_score = None
 
@@ -55,7 +56,7 @@ def run_benchmark() -> dict:
             "agreement": abs(rule_score - (ml_score or rule_score)) < 10 if ml_score else None,
         })
 
-        profile_data["label"] = label  # restore
+        # No mutation needed - data is a copy
 
     # Compute agreement metrics
     valid = [r for r in results if r["ml_score"] is not None]

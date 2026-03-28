@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { CardSkeleton } from "@/components/ui/Skeleton";
@@ -58,9 +56,7 @@ export default function SentimentPage() {
   }, [category]);
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Market sentiment analysis">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Market Sentiment</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-6">AI-powered analysis of financial news using FinBERT</p>
@@ -161,7 +157,6 @@ export default function SentimentPage() {
             </>
           )}
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

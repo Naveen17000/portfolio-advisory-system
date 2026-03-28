@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.dependencies import get_current_user
@@ -11,7 +13,7 @@ router = APIRouter()
 @router.get("/classified")
 async def get_classified_stocks(user: User = Depends(get_current_user)):
     """Get all stocks classified by risk category using real market data."""
-    return classify_all_stocks()
+    return await asyncio.to_thread(classify_all_stocks)
 
 
 @router.get("/metrics/{ticker}")
@@ -20,7 +22,7 @@ async def get_stock_metrics(
     user: User = Depends(get_current_user),
 ):
     """Get detailed metrics for a specific stock."""
-    metrics = compute_stock_metrics(ticker)
+    metrics = await asyncio.to_thread(compute_stock_metrics, ticker)
     if metrics is None:
         raise HTTPException(status_code=404, detail=f"Could not fetch data for {ticker}")
     from app.services.stock_classifier import classify_stock
@@ -30,4 +32,4 @@ async def get_stock_metrics(
 @router.get("/asset-class-stats")
 async def get_asset_stats(user: User = Depends(get_current_user)):
     """Get real historical returns and volatility for each asset class."""
-    return get_asset_class_historical_stats()
+    return await asyncio.to_thread(get_asset_class_historical_stats)

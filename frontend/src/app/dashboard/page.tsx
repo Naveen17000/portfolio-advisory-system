@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import type { RiskAssessment, Portfolio, FinancialProfile } from "@/types";
+  import type { RiskAssessment, Portfolio, FinancialProfile } from "@/types";
 import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";

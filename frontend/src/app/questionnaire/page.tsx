@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import type { Question } from "@/types";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
@@ -93,22 +91,19 @@ export default function QuestionnairePage() {
 
   if (loading) {
     return (
-      <AuthGuard>
-        <Navbar />
+      <AppShell>
         <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-8" role="main" aria-label="Loading questionnaire">
           <div className="space-y-6">
             <CardSkeleton />
             <CardSkeleton />
           </div>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-8" role="main" aria-label="Financial profile questionnaire">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Financial Profile Questionnaire</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-6">Help us understand your financial situation to provide personalized advice.</p>
@@ -185,7 +180,6 @@ export default function QuestionnairePage() {
             </div>
           </div>
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

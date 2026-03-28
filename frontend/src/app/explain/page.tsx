@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from "recharts";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 
@@ -44,8 +42,7 @@ export default function ExplainPage() {
 
   if (loading) {
     return (
-      <AuthGuard>
-        <Navbar />
+      <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Loading risk explainability">
           <div className="space-y-6">
             <CardSkeleton />
@@ -53,18 +50,17 @@ export default function ExplainPage() {
             <CardSkeleton />
           </div>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   if (error || !data) {
     return (
-      <AuthGuard>
-        <Navbar />
+      <AppShell>
         <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400" role="main">
           {error || "No explanation data available. Complete your profile first."}
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
@@ -78,9 +74,7 @@ export default function ExplainPage() {
     .slice(0, 10);
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Risk score explainability">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Risk Score Explainability</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8">Understand why your risk score is what it is — powered by SHAP</p>
@@ -96,7 +90,7 @@ export default function ExplainPage() {
           </Card>
 
           <Card title="Feature Impact on Risk Score" className="mb-6">
-            <div className="w-full h-96 overflow-x-auto" aria-label="SHAP feature impact chart">
+            <div className="w-full h-96 overflow-hidden" style={{ minHeight: 0 }} aria-label="SHAP feature impact chart">
               <ResponsiveContainer width="100%" height="100%" minWidth={500}>
                 <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
                   <XAxis type="number" tick={{ fontSize: 11 }} />
@@ -150,7 +144,6 @@ export default function ExplainPage() {
             </div>
           </Card>
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 import { ASSET_CLASS_LABELS, ASSET_CLASS_COLORS } from "@/lib/constants";
@@ -54,7 +52,7 @@ export default function BenchmarksPage() {
 
   if (loading) {
     return (
-      <AuthGuard><Navbar />
+      <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Loading benchmarks">
           <div className="space-y-6">
             <CardSkeleton />
@@ -62,17 +60,17 @@ export default function BenchmarksPage() {
             <CardSkeleton />
           </div>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   if (!data) {
     return (
-      <AuthGuard><Navbar />
+      <AppShell>
         <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400" role="main">
           Complete your profile to see peer benchmarks.
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
@@ -85,9 +83,7 @@ export default function BenchmarksPage() {
   const ratingStyle = RATING_STYLES[data.overall.rating] || RATING_STYLES.average;
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Peer benchmarking">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Peer Benchmarking</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
@@ -129,7 +125,7 @@ export default function BenchmarksPage() {
 
           {/* Comparison Chart */}
           <Card title="You vs Peers" className="mb-6">
-            <div className="w-full h-72 overflow-x-auto" aria-label="Comparison bar chart">
+            <div className="w-full h-72 overflow-hidden" style={{ minHeight: 0 }} aria-label="Comparison bar chart">
               <ResponsiveContainer width="100%" height="100%" minWidth={400}>
                 <BarChart data={chartData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
@@ -215,7 +211,6 @@ export default function BenchmarksPage() {
             All peer data is anonymized and aggregated. Individual privacy is fully protected.
           </p>
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

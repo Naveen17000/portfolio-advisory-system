@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { CardSkeleton } from "@/components/ui/Skeleton";
@@ -66,9 +64,7 @@ export default function UploadPage() {
   };
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-8" role="main" aria-label="Bank statement upload">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Bank Statement Upload</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-6">Upload a CSV bank statement to auto-detect income, expenses, and spending patterns</p>
@@ -159,7 +155,6 @@ export default function UploadPage() {
             </>
           )}
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

@@ -98,7 +98,7 @@ export default function ModelBenchmarkPage() {
                   Agreement Rate
                 </p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {(data.metrics.agreement_rate * 100).toFixed(1)}%
+                  {data.metrics.agreement_rate_pct?.toFixed(1) ?? "N/A"}%
                 </p>
               </Card>
               <Card>
@@ -106,7 +106,7 @@ export default function ModelBenchmarkPage() {
                   Avg Score Difference
                 </p>
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  {data.metrics.avg_difference.toFixed(2)}
+                  {data.metrics.avg_score_difference?.toFixed(2) ?? "N/A"}
                 </p>
               </Card>
               <Card>
@@ -114,7 +114,7 @@ export default function ModelBenchmarkPage() {
                   Correlation
                 </p>
                 <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {data.metrics.correlation.toFixed(3)}
+                  {data.metrics.correlation?.toFixed(3) ?? "N/A"}
                 </p>
               </Card>
             </div>
@@ -143,22 +143,22 @@ export default function ModelBenchmarkPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.comparisons.map((row) => (
+                    {(data.benchmark_results ?? data.comparisons ?? []).map((row) => (
                       <tr
                         key={row.profile_name}
                         className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30"
                       >
                         <td className="py-3 px-2 text-gray-900 dark:text-gray-100 font-medium capitalize">
-                          {row.profile_name.replace(/_/g, " ")}
+                          {(row.profile ?? row.profile_name ?? "").replace(/_/g, " ")}
                         </td>
                         <td className="py-3 px-2 text-right text-gray-700 dark:text-gray-300">
                           {row.rule_based_score.toFixed(1)}
                         </td>
                         <td className="py-3 px-2 text-right text-gray-700 dark:text-gray-300">
-                          {row.ml_score.toFixed(1)}
+                          {row.ml_score?.toFixed(1) ?? "N/A"}
                         </td>
                         <td className="py-3 px-2 text-right font-semibold text-gray-900 dark:text-gray-100">
-                          {row.blended_score.toFixed(1)}
+                          {row.blended_score?.toFixed(1) ?? "N/A"}
                         </td>
                         <td className="py-3 px-2 text-center">
                           <span
@@ -180,6 +180,7 @@ export default function ModelBenchmarkPage() {
 
             {/* Feature Importance Chart */}
             <Card title="Feature Importance" className="mb-6">
+              <div className="overflow-hidden" style={{ minHeight: 0 }}>
               <ResponsiveContainer width="100%" height={Math.max(300, featureChartData.length * 40)}>
                 <BarChart
                   data={featureChartData}
@@ -211,6 +212,7 @@ export default function ModelBenchmarkPage() {
                   <Bar dataKey="importance" fill="#8B5CF6" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             </Card>
 
             {/* Model Info */}

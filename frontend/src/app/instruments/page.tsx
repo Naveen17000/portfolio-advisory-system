@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
-import AuthGuard from "@/components/layout/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import AppShell from "@/components/layout/AppShell";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 import { ASSET_CLASS_LABELS, ASSET_CLASS_COLORS } from "@/lib/constants";
@@ -26,7 +24,7 @@ export default function InstrumentsPage() {
 
   if (loading) {
     return (
-      <AuthGuard><Navbar />
+      <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Loading instruments">
           <div className="space-y-6">
             <CardSkeleton />
@@ -34,14 +32,12 @@ export default function InstrumentsPage() {
             <CardSkeleton />
           </div>
         </div>
-      </AuthGuard>
+      </AppShell>
     );
   }
 
   return (
-    <AuthGuard>
-      <Navbar />
-      <ErrorBoundary>
+    <AppShell>
         <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-8" role="main" aria-label="Suggested instruments">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Suggested Instruments</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-6">Specific fund and stock recommendations mapped to your portfolio allocation</p>
@@ -119,7 +115,6 @@ export default function InstrumentsPage() {
             For educational purposes only. Do your own research before investing.
           </p>
         </div>
-      </ErrorBoundary>
-    </AuthGuard>
+    </AppShell>
   );
 }

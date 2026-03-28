@@ -19,17 +19,15 @@ import {
 } from "recharts";
 
 interface FrontierPoint {
-  risk: number;
+  volatility: number;
   return: number;
-  sharpe_ratio: number;
-  is_optimal: boolean;
-  is_min_variance: boolean;
-  weights: Record<string, number>;
+  sharpe: number;
+  weights?: Record<string, number>;
 }
 
 interface AssetPoint {
   name: string;
-  risk: number;
+  volatility: number;
   return: number;
 }
 
@@ -38,10 +36,12 @@ interface FrontierData {
   asset_points: AssetPoint[];
   optimal_portfolio: FrontierPoint;
   min_variance_portfolio: FrontierPoint;
+  risk_free_rate: number;
 }
 
 interface CorrelationData {
-  assets: string[];
+  labels?: string[];
+  assets?: string[];
   matrix: number[][];
 }
 
@@ -82,33 +82,31 @@ export default function FrontierPage() {
 
   const frontierScatterData = frontier
     ? frontier.frontier_points.map((p) => ({
-        x: +(p.risk * 100).toFixed(2),
-        y: +(p.return * 100).toFixed(2),
-        isOptimal: p.is_optimal,
-        isMinVar: p.is_min_variance,
+        x: +p.volatility.toFixed(2),
+        y: +p.return.toFixed(2),
       }))
     : [];
 
   const assetScatterData = frontier
     ? frontier.asset_points.map((a) => ({
-        x: +(a.risk * 100).toFixed(2),
-        y: +(a.return * 100).toFixed(2),
+        x: +a.volatility.toFixed(2),
+        y: +a.return.toFixed(2),
         name: a.name,
       }))
     : [];
 
   const optimalPoint = frontier
     ? {
-        x: +(frontier.optimal_portfolio.risk * 100).toFixed(2),
-        y: +(frontier.optimal_portfolio.return * 100).toFixed(2),
+        x: +frontier.optimal_portfolio.volatility.toFixed(2),
+        y: +frontier.optimal_portfolio.return.toFixed(2),
         name: "Max Sharpe",
       }
     : null;
 
   const minVarPoint = frontier
     ? {
-        x: +(frontier.min_variance_portfolio.risk * 100).toFixed(2),
-        y: +(frontier.min_variance_portfolio.return * 100).toFixed(2),
+        x: +frontier.min_variance_portfolio.volatility.toFixed(2),
+        y: +frontier.min_variance_portfolio.return.toFixed(2),
         name: "Min Variance",
       }
     : null;
@@ -135,6 +133,7 @@ export default function FrontierPage() {
           <>
             {/* Efficient Frontier Scatter Chart */}
             <Card title="Risk vs Return" className="mb-6">
+              <div className="overflow-hidden" style={{ minHeight: 0 }}>
               <ResponsiveContainer width="100%" height={450}>
                 <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -226,79 +225,54 @@ export default function FrontierPage() {
                   )}
                 </ScatterChart>
               </ResponsiveContainer>
+              </div>
             </Card>
 
             {/* Optimal Portfolio Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
               <Card title="Optimal Portfolio (Max Sharpe)">
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">Expected Return</span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {(frontier.optimal_portfolio.return * 100).toFixed(2)}%
+                      {frontier.optimal_portfolio.return.toFixed(2)}%
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">Risk (Std Dev)</span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {(frontier.optimal_portfolio.risk * 100).toFixed(2)}%
+                      {frontier.optimal_portfolio.volatility.toFixed(2)}%
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">Sharpe Ratio</span>
                     <span className="font-semibold text-green-600 dark:text-green-400">
-                      {frontier.optimal_portfolio.sharpe_ratio.toFixed(3)}
+                      {frontier.optimal_portfolio.sharpe.toFixed(3)}
                     </span>
                   </div>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Weights</p>
-                <div className="space-y-1">
-                  {Object.entries(frontier.optimal_portfolio.weights).map(([k, v]) => (
-                    <div key={k} className="flex justify-between text-xs">
-                      <span className="text-gray-600 dark:text-gray-300 capitalize">
-                        {k.replace(/_/g, " ")}
-                      </span>
-                      <span className="text-gray-900 dark:text-gray-100 font-medium">
-                        {(v * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                  ))}
                 </div>
               </Card>
 
               <Card title="Min Variance Portfolio">
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">Expected Return</span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {(frontier.min_variance_portfolio.return * 100).toFixed(2)}%
+                      {frontier.min_variance_portfolio.return.toFixed(2)}%
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">Risk (Std Dev)</span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {(frontier.min_variance_portfolio.risk * 100).toFixed(2)}%
+                      {frontier.min_variance_portfolio.volatility.toFixed(2)}%
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">Sharpe Ratio</span>
                     <span className="font-semibold text-blue-600 dark:text-blue-400">
-                      {frontier.min_variance_portfolio.sharpe_ratio.toFixed(3)}
+                      {frontier.min_variance_portfolio.sharpe.toFixed(3)}
                     </span>
                   </div>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Weights</p>
-                <div className="space-y-1">
-                  {Object.entries(frontier.min_variance_portfolio.weights).map(([k, v]) => (
-                    <div key={k} className="flex justify-between text-xs">
-                      <span className="text-gray-600 dark:text-gray-300 capitalize">
-                        {k.replace(/_/g, " ")}
-                      </span>
-                      <span className="text-gray-900 dark:text-gray-100 font-medium">
-                        {(v * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                  ))}
                 </div>
               </Card>
             </div>
@@ -313,7 +287,7 @@ export default function FrontierPage() {
                 <thead>
                   <tr>
                     <th className="py-2 px-2 text-left text-gray-600 dark:text-gray-400" />
-                    {correlation.assets.map((a) => (
+                    {(correlation.labels ?? correlation.assets).map((a) => (
                       <th
                         key={a}
                         className="py-2 px-2 text-center text-gray-600 dark:text-gray-400 font-medium capitalize"
@@ -324,7 +298,7 @@ export default function FrontierPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {correlation.assets.map((rowAsset, i) => (
+                  {(correlation.labels ?? correlation.assets).map((rowAsset, i) => (
                     <tr key={rowAsset}>
                       <td className="py-2 px-2 text-gray-700 dark:text-gray-300 font-medium capitalize whitespace-nowrap">
                         {rowAsset.replace(/_/g, " ")}

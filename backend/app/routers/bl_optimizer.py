@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,15 +32,16 @@ async def get_bl_optimization(
     assessment = result.scalar_one_or_none()
     risk_category = assessment.risk_category if assessment else "moderate"
 
-    # Try to get sentiment for views
+    # Try to get sentiment for views (run in thread to avoid blocking event loop)
     sentiment = None
     try:
         from app.services.sentiment_analyzer import get_market_sentiment
-        sentiment = get_market_sentiment("general")
+        sentiment = await asyncio.to_thread(get_market_sentiment, "general")
     except Exception:
         pass
 
-    return optimize_black_litterman(
+    return await asyncio.to_thread(
+        optimize_black_litterman,
         risk_category=risk_category,
         life_stage=profile.life_stage,
         sentiment=sentiment,
