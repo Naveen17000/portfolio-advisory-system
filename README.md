@@ -12,7 +12,7 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Portfolio Generation (MPT)** - Modern Portfolio Theory-based asset allocation across 6 classes (Large/Mid/Small Cap Equity, Debt, Gold/Commodities, Liquid Funds) with boundary interpolation
 - **Black-Litterman Optimization** - Bayesian portfolio optimization combining market equilibrium returns with investor views derived from risk profile and market sentiment
 - **Suggested Instruments** - Specific mutual fund and stock recommendations mapped to each asset class allocation, with curated fund database and real-time stock picks
-- **Interactive Dashboard** - Risk gauge, score breakdown charts, allocation pie chart, expected return ranges, and quick navigation
+- **Interactive Dashboard** - KPI strip (health grade, savings rate, emergency fund, risk category, return range), risk gauge, score breakdown charts, allocation pie chart, top priority nudges, and action grid navigation
 - **JWT Authentication** - Secure registration and login with access + refresh token flow, auto-refresh on expiry
 - **Profile Management** - View/edit financial data with one-click re-assessment
 
@@ -28,7 +28,7 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Real Market Data** - yfinance integration for historical returns, volatility, and asset class statistics with 24-hour disk caching
 
 ### Phase 3 - Advanced Features
-- **Conversational AI Assistant (Gemini LLM)** - Google Gemini 2.5 Flash-powered chatbot with full financial context injection (risk score, life stage, income, savings, investment horizon). Provides personalized, conversational investment guidance in English/Hinglish with Indian financial context (80C, ELSS, NPS, PPF, SGB). Falls back to rule-based 12-topic knowledge base if API is unavailable
+- **Conversational AI Assistant (Gemini LLM)** - Google Gemini 2.5 Flash-powered chatbot with SSE streaming (real-time token-by-token responses), persistent conversation history, and full financial context injection (risk score, life stage, income, savings, investment horizon). Provides personalized, conversational investment guidance in English/Hinglish with Indian financial context (80C, ELSS, NPS, PPF, SGB). Falls back to rule-based 12-topic knowledge base if API is unavailable
 - **Anomaly Detection & Behavioral Nudge Engine** - Detects 10 types of financial anomalies including behavioral patterns (lifestyle inflation, cash hoarding, over-concentration, insurance gap), generates impact-scored nudges (0-100) with smart prioritization, micro-wins for positive reinforcement, trend indicators per metric, and overall tone classification (encouraging/mixed/concerning). Health grade A-F
 - **Gamification** - 16 achievements across 6 categories (savings milestones, emergency fund, debt management, diversification, experience, discipline) with a 6-level progression system (Beginner to Master Investor)
 - **Peer Benchmarking** - Anonymized comparison against life-stage cohorts across 6 metrics (savings rate, spending ratio, emergency fund, debt-to-income, risk score, investment diversity) with percentile rankings and cohort allocation benchmarks
@@ -195,7 +195,7 @@ portfolio-advisory-system/
 │       │   ├── market_data.py      # yfinance data fetcher & cache
 │       │   ├── stock_classifier.py # Stock risk classification
 │       │   ├── shap_explainer.py   # SHAP feature explanations
-���       │   ├── chatbot.py          # Gemini LLM chatbot + rule-based fallback
+│       │   ├── chatbot.py          # Gemini LLM chatbot + SSE streaming + fallback
 │       │   ├── anomaly_detector.py # Financial anomaly detection
 │       │   ├── gamification.py     # Achievement & leveling system
 │       │   ├── peer_benchmark.py   # Cohort comparison engine
@@ -404,6 +404,8 @@ cd frontend && npm test
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/v1/chat/message` | Chat with AI assistant |
+| POST | `/api/v1/chat/stream` | SSE streaming chat (real-time tokens) |
+| GET | `/api/v1/chat/history` | Get conversation history (last 50) |
 | GET | `/api/v1/nudges/` | Financial health check & action items |
 | GET | `/api/v1/achievements/` | Gamification achievements & level |
 | GET | `/api/v1/benchmark/` | Peer benchmarking comparison |
@@ -558,8 +560,8 @@ Service Layer (28 services):
 └── GDPR Handler                    →  Data export & account deletion
         ↓
 Data Layer:
-├── PostgreSQL 16                   →  8 tables (users, profiles, assessments,
-│                                       portfolios, allocations, snapshots, SIP records, audit_logs)
+├── PostgreSQL 16                   →  9 tables (users, profiles, assessments,
+│                                       portfolios, allocations, snapshots, SIP records, audit_logs, chat_messages)
 ├── Redis 7                         →  Rate limiting, caching, session store
 └── File Cache                      →  yfinance market data (24h TTL)
         ↓
