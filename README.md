@@ -1,12 +1,12 @@
 # AI-Driven Investment Risk Profiling & Portfolio Advisory System
 
-An intelligent financial advisory platform that delivers highly personalized investment guidance by integrating behavioral intelligence, explainable AI, financial modeling, and real-time market insights. Built as a full-stack application with **34 interactive pages**, **55+ API endpoints**, **29 backend services**, **22 components**, and production-ready infrastructure.
+An intelligent financial advisory platform that delivers highly personalized investment guidance by integrating behavioral intelligence, explainable AI, financial modeling, and real-time market insights. Built as a full-stack application with **34 interactive pages**, **50 API endpoints**, **30 backend services**, **22 components**, **92 tests**, and production-ready infrastructure.
 
 ## Features
 
 ### Phase 1 - Core Platform
 - **Adaptive Questionnaire** - 6-step financial profiling (income, expenses, liabilities, emergency fund, investment experience, risk attitude) with conditional logic
-- **Bank Statement Parsing** - CSV upload with auto-categorization of 14 expense types (groceries, dining, transport, utilities, rent, EMI, insurance, investments, shopping, entertainment, healthcare, education, transfers, salary), spending analysis, and auto-profile population
+- **Bank Statement Parsing** - CSV upload supporting 8+ bank formats: separate debit/credit columns, single amount with +/- signs, amount with Cr/Dr suffix, Type column (CR/DR), parenthesized negatives, Indian comma notation (₹50,000.00), Rs/INR prefixes. Auto-categorization of 16 expense types (groceries, dining, transport, utilities, rent, EMI, insurance, investments, shopping, entertainment, healthcare, education, transfers, salary, interest, cashback). Clear error messages for malformed files
 - **Behavioral Risk Scoring** - Rule-based engine with 4 weighted sub-scores: spending ratio (25%), savings consistency (25%), investment discipline (30%), liability burden (20%)
 - **Life-Stage Awareness** - Dynamic adjustments for Student, Early Career, Family, and Pre-Retirement stages with investment horizon modifiers
 - **Portfolio Generation (MPT)** - Modern Portfolio Theory-based asset allocation across 6 classes (Large/Mid/Small Cap Equity, Debt, Gold/Commodities, Liquid Funds) with boundary interpolation
@@ -76,7 +76,7 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Health Checks** - `/health` endpoint checking API, database, and Redis connectivity
 - **Production Docker** - Multi-stage Dockerfiles (non-root users, gunicorn), docker-compose.prod.yml with Nginx reverse proxy
 - **CI/CD** - GitHub Actions workflow (backend lint + test, frontend lint + build, Docker build)
-- **Backend Tests** - 49+ tests (auth API, health, auth service, risk engine, portfolio engine) with SQLite async test fixtures
+- **Backend Tests** - 73 tests (auth API, health, auth service, risk engine, portfolio engine) with SQLite async test fixtures
 - **Frontend Tests** - 19 tests (Button, Input, Card, Select, API lib) with Vitest + React Testing Library
 
 ## Tech Stack
@@ -128,8 +128,8 @@ portfolio-advisory-system/
 │   │       ├── test_risk_engine.py
 │   │       └── test_portfolio_engine.py
 │   └── app/
-│       ├── main.py                 # App entry, lifespan, middleware, 29 routers
-│       ├── config.py               # Environment settings (12 variables)
+│       ├── main.py                 # App entry, lifespan, middleware, 30 routers
+│       ├── config.py               # Environment settings (13 variables)
 │       ├── database.py             # Async SQLAlchemy engine & session
 │       ├── dependencies.py         # get_db, get_current_user (JWT)
 │       │
@@ -138,17 +138,18 @@ portfolio-advisory-system/
 │       │   ├── error_handler.py        # Global exception handlers
 │       │   └── rate_limiter.py         # SlowAPI rate limiting
 │       │
-│       ├── models/                 # SQLAlchemy ORM models (6 files)
+│       ├── models/                 # SQLAlchemy ORM models (7 files)
 │       │   ├── user.py             # Users table
 │       │   ├── financial_profile.py # Financial profiles (JSONB fields)
 │       │   ├── risk_assessment.py  # Risk scores & sub-scores
 │       │   ├── portfolio.py        # Portfolios & allocations
 │       │   ├── spending_history.py # Monthly snapshots & SIP records
-│       │   └── audit_log.py        # Audit trail for user actions
+│       │   ├── audit_log.py        # Audit trail for user actions
+│       │   └── chat_message.py    # Chat conversation history
 │       │
 │       ├── schemas/                # Pydantic request/response schemas (10 files)
 │       │
-│       ├── routers/                # API route handlers (29 routers)
+│       ├── routers/                # API route handlers (30 routers)
 │       │   ├── auth.py             # Register, login, refresh, me
 │       │   ├── profile.py          # Financial profile CRUD
 │       │   ├── questionnaire.py    # Adaptive questionnaire
@@ -179,7 +180,7 @@ portfolio-advisory-system/
 │       │   ├── compounding.py      # Compounding calculator
 │       │   └── gdpr.py             # GDPR data export & account deletion
 │       │
-│       ├── services/               # Business logic (29 services)
+│       ├── services/               # Business logic (30 services)
 │       │   ├── auth_service.py     # Password hashing, JWT access + refresh tokens
 │       │   ├── profile_service.py  # Profile CRUD operations
 │       │   ├── questionnaire_service.py  # Question definitions
@@ -533,7 +534,7 @@ Middleware Layer:
 ├── Error Handler                   →  Sanitized responses, validation errors
 └── Rate Limiter                    →  SlowAPI + Redis backend
         ↓
-Service Layer (28 services):
+Service Layer (30 services):
 ├── Authentication                  →  Register, login, JWT access + refresh tokens
 ├── Data Collection                 →  Questionnaire, CSV parser
 ├── Risk Profiling Engine           →  Rule-based + ML hybrid scoring

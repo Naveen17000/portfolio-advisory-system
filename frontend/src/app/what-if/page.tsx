@@ -334,12 +334,7 @@ export default function WhatIfPage() {
                   />
                   <Tooltip
                     formatter={(value: number) => `${value}%`}
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "1px solid #374151",
-                      borderRadius: "8px",
-                      color: "#F3F4F6",
-                    }}
+                    contentStyle={{ backgroundColor: "var(--tooltip-bg, #fff)", borderColor: "var(--tooltip-border, #e5e7eb)", borderRadius: "8px", color: "var(--tooltip-text, #111)" }}
                   />
                   <Legend />
                   <Bar dataKey="Base" fill="#3B82F6" radius={[0, 4, 4, 0]} />

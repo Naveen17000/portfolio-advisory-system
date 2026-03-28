@@ -18,19 +18,40 @@ async def upload_csv_statement(
     db: AsyncSession = Depends(get_db),
 ):
     """Upload a CSV bank statement for automated financial profiling."""
-    if not file.filename or not file.filename.endswith(".csv"):
-        raise HTTPException(status_code=400, detail="Only CSV files are supported")
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file uploaded. Please select a CSV file.")
+
+    if not file.filename.lower().endswith(".csv"):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type '{file.filename.split('.')[-1]}'. Only .csv files are supported."
+        )
 
     content = await file.read()
+    if len(content) == 0:
+        raise HTTPException(status_code=400, detail="The uploaded file is empty.")
+
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB.")
+
     try:
         text = content.decode("utf-8")
     except UnicodeDecodeError:
-        text = content.decode("latin-1")
+        try:
+            text = content.decode("latin-1")
+        except UnicodeDecodeError:
+            raise HTTPException(status_code=400, detail="Could not read file. Ensure it is a valid CSV with UTF-8 or Latin-1 encoding.")
 
     result = parse_csv_statement(text)
 
     if "error" in result:
         raise HTTPException(status_code=400, detail=result["error"])
+
+    if result["summary"]["total_transactions"] == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="No transactions found in the CSV. Ensure it has columns like Date, Description, and Amount (or Debit/Credit)."
+        )
 
     # Save monthly snapshots
     for month_data in result.get("monthly_trend", []):

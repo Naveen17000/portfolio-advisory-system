@@ -3,11 +3,17 @@
 :root {
   --background: #f9fafb;
   --foreground: #111827;
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #e5e7eb;
+  --tooltip-text: #111827;
 }
 
 .dark {
   --background: #0f172a;
   --foreground: #f1f5f9;
+  --tooltip-bg: #1e293b;
+  --tooltip-border: #334155;
+  --tooltip-text: #f1f5f9;
 }
 
 @theme inline {
@@ -21,70 +27,6 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-}
-
-/* Dark mode overrides for common patterns */
-.dark .bg-white {
-  background-color: #1e293b;
-}
-
-.dark .bg-gray-50 {
-  background-color: #0f172a;
-}
-
-.dark .border-gray-200 {
-  border-color: #334155;
-}
-
-.dark .text-gray-900 {
-  color: #f1f5f9;
-}
-
-.dark .text-gray-700 {
-  color: #cbd5e1;
-}
-
-.dark .text-gray-600 {
-  color: #94a3b8;
-}
-
-.dark .text-gray-500 {
-  color: #94a3b8;
-}
-
-.dark .text-gray-400 {
-  color: #64748b;
-}
-
-.dark .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-}
-
-.dark .bg-red-50 {
-  background-color: rgba(127, 29, 29, 0.3);
-}
-
-.dark .text-red-700 {
-  color: #fca5a5;
-}
-
-.dark .border-gray-300 {
-  border-color: #475569;
-}
-
-.dark input,
-.dark select {
-  background-color: #1e293b;
-  border-color: #475569;
-  color: #f1f5f9;
-}
-
-.dark input::placeholder {
-  color: #64748b;
-}
-
-.dark .hover\:bg-gray-50:hover {
-  background-color: #1e293b;
 }
 
 /* Toast animation */
