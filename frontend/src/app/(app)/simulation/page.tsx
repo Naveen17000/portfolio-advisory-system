@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import FanChart from "@/components/simulation/FanChart";
+import Tip from "@/components/ui/Tooltip";
 
 interface SimulationResult {
   parameters: {
@@ -77,7 +78,7 @@ export default function SimulationPage() {
   return (
     <>
         <div className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8" role="main" aria-label="Monte Carlo Simulation">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Monte Carlo Simulation</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"><Tip term="Monte Carlo">Monte Carlo</Tip> Simulation</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8">Simulate thousands of possible portfolio outcomes based on your allocation</p>
 
           <Card title="Simulation Parameters">
@@ -89,7 +90,7 @@ export default function SimulationPage() {
                 onChange={(e) => setForm((f) => ({ ...f, initial: e.target.value }))}
               />
               <Input
-                label="Monthly SIP"
+                label={<Tip term="SIP">Monthly SIP</Tip>}
                 type="number"
                 value={form.sip}
                 onChange={(e) => setForm((f) => ({ ...f, sip: e.target.value }))}
@@ -159,7 +160,7 @@ export default function SimulationPage() {
                   <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{result.parameters.portfolio_expected_return}%</p>
                 </Card>
                 <Card>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Portfolio Volatility</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400"><Tip term="Volatility">Portfolio Volatility</Tip></p>
                   <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{result.parameters.portfolio_volatility}%</p>
                 </Card>
                 <Card>

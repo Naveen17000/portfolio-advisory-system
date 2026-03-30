@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import Card from "@/components/ui/Card";
+import Tip from "@/components/ui/Tooltip";
 import { PageSkeleton } from "@/components/ui/Skeleton";
 import {
   ScatterChart,
@@ -114,7 +115,7 @@ export default function FrontierPage() {
     <>
       <div className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-          Efficient Frontier
+          <Tip term="Efficient Frontier">Efficient Frontier</Tip>
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mb-8">
           Visualize the risk-return tradeoff and optimal portfolio allocations.
@@ -133,8 +134,8 @@ export default function FrontierPage() {
             {/* Efficient Frontier Scatter Chart */}
             <Card title="Risk vs Return" className="mb-6">
               <div className="overflow-hidden" style={{ minHeight: 0 }}>
-              <ResponsiveContainer width="100%" height={450}>
-                <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
+              <ResponsiveContainer width="100%" height={500}>
+                <ScatterChart margin={{ top: 20, right: 30, bottom: 50, left: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis
                     dataKey="x"
@@ -145,8 +146,9 @@ export default function FrontierPage() {
                     label={{
                       value: "Risk (Std Dev %)",
                       position: "insideBottom",
-                      offset: -10,
-                      style: { fill: "#9CA3AF" },
+                      offset: -5,
+                      dy: 15,
+                      style: { fill: "#9CA3AF", fontSize: 13 },
                     }}
                   />
                   <YAxis
@@ -164,12 +166,19 @@ export default function FrontierPage() {
                   />
                   <Tooltip
                     contentStyle={{ backgroundColor: "var(--tooltip-bg, #fff)", borderColor: "var(--tooltip-border, #e5e7eb)", borderRadius: "8px", color: "var(--tooltip-text, #111)" }}
-                    formatter={(value: number, name: string) => [
-                      `${value}%`,
-                      name === "x" ? "Risk" : "Return",
-                    ]}
+                    content={({ active, payload }) => {
+                      if (!active || !payload?.length) return null;
+                      const point = payload[0]?.payload as { x?: number; y?: number; name?: string };
+                      return (
+                        <div style={{ backgroundColor: "var(--tooltip-bg, #1f2937)", border: "1px solid var(--tooltip-border, #374151)", borderRadius: 8, padding: "8px 12px", color: "var(--tooltip-text, #f3f4f6)", fontSize: 13 }}>
+                          {point.name && <div style={{ fontWeight: 600, marginBottom: 4 }}>{point.name}</div>}
+                          <div>Risk (Volatility): <strong>{point.x?.toFixed(2)}%</strong></div>
+                          <div>Expected Return: <strong>{point.y?.toFixed(2)}%</strong></div>
+                        </div>
+                      );
+                    }}
                   />
-                  <Legend />
+                  <Legend verticalAlign="bottom" wrapperStyle={{ paddingTop: 30 }} />
 
                   {/* Frontier curve points */}
                   <Scatter
@@ -239,7 +248,7 @@ export default function FrontierPage() {
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Sharpe Ratio</span>
+                    <span className="text-gray-500 dark:text-gray-400"><Tip term="Sharpe Ratio">Sharpe Ratio</Tip></span>
                     <span className="font-semibold text-green-600 dark:text-green-400">
                       {frontier.optimal_portfolio.sharpe.toFixed(3)}
                     </span>
@@ -262,7 +271,7 @@ export default function FrontierPage() {
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Sharpe Ratio</span>
+                    <span className="text-gray-500 dark:text-gray-400"><Tip term="Sharpe Ratio">Sharpe Ratio</Tip></span>
                     <span className="font-semibold text-blue-600 dark:text-blue-400">
                       {frontier.min_variance_portfolio.sharpe.toFixed(3)}
                     </span>
@@ -275,7 +284,7 @@ export default function FrontierPage() {
 
         {/* Correlation Heatmap */}
         {correlation && (
-          <Card title="Asset Correlation Heatmap">
+          <Card title={<>Asset <Tip term="Correlation">Correlation</Tip> Heatmap</>}>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>

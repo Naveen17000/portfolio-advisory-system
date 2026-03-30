@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { CardSkeleton } from "@/components/ui/Skeleton";
+import Tip from "@/components/ui/Tooltip";
 
 const ASSET_CLASSES = [
   "equity",
@@ -181,7 +182,7 @@ export default function RebalancePage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
               <Card>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Total Drift
+                  Total <Tip term="Drift">Drift</Tip>
                 </p>
                 <p
                   className={`text-2xl font-bold ${
@@ -214,7 +215,7 @@ export default function RebalancePage() {
               {result.rebalance_schedule && (
                 <Card>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Rebalancing Schedule
+                    <Tip term="Rebalancing">Rebalancing</Tip> Schedule
                   </p>
                   <p className="text-lg font-bold text-gray-900 dark:text-gray-100 capitalize mt-1">
                     {result.rebalance_schedule.rebalance_frequency}
@@ -230,7 +231,7 @@ export default function RebalancePage() {
             </div>
 
             {/* Rebalancing Actions Table */}
-            <Card title="Rebalancing Actions" className="mt-6">
+            <Card title={<><Tip term="Rebalancing">Rebalancing</Tip> Actions</>} className="mt-6">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -245,7 +246,7 @@ export default function RebalancePage() {
                         Target
                       </th>
                       <th className="text-right py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
-                        Drift
+                        <Tip term="Drift">Drift</Tip>
                       </th>
                       <th className="text-right py-3 px-2 text-gray-600 dark:text-gray-400 font-medium">
                         Amount

@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { CardSkeleton } from "@/components/ui/Skeleton";
+import Tip from "@/components/ui/Tooltip";
 
 interface ClassifiedStock {
   ticker: string;
@@ -226,11 +227,11 @@ export default function StocksPage() {
                       <tr className="border-b border-gray-200 dark:border-gray-700">
                         <th className="text-left py-2 px-3 font-medium text-gray-500 dark:text-gray-400">Stock</th>
                         <th className="text-left py-2 px-2 font-medium text-gray-500 dark:text-gray-400">Sector</th>
-                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">Beta</th>
-                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">Volatility</th>
-                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">Return (1Y)</th>
-                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">Sharpe</th>
-                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">Mkt Cap</th>
+                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400"><Tip term="Beta">Beta</Tip></th>
+                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400"><Tip term="Volatility">Volatility</Tip></th>
+                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400"><Tip term="Annualized Return">Return (1Y)</Tip></th>
+                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400"><Tip term="Sharpe Ratio">Sharpe</Tip></th>
+                        <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400"><Tip term="Market Cap">Mkt Cap</Tip></th>
                         <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">Risk</th>
                       </tr>
                     </thead>

@@ -1,9 +1,9 @@
 "use client";
 
-import { InputHTMLAttributes, useId } from "react";
+import { InputHTMLAttributes, ReactNode, useId } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  label?: ReactNode;
   error?: string;
 }
 

@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { CardSkeleton } from "@/components/ui/Skeleton";
+import Tip from "@/components/ui/Tooltip";
 
 interface TaxSlab {
   slab: string;
@@ -108,21 +109,21 @@ export default function TaxPage() {
               placeholder="1200000"
             />
             <Input
-              label="Section 80C Deductions"
+              label={<><Tip term="80C">Section 80C</Tip> Deductions</>}
               type="number"
               value={form.deductions_80c}
               onChange={(e) => updateField("deductions_80c", e.target.value)}
               placeholder="150000"
             />
             <Input
-              label="Section 80D (Health Insurance)"
+              label={<><Tip term="80D">Section 80D (Health Insurance)</Tip></>}
               type="number"
               value={form.deductions_80d}
               onChange={(e) => updateField("deductions_80d", e.target.value)}
               placeholder="25000"
             />
             <Input
-              label="NPS Contribution (80CCD)"
+              label={<><Tip term="NPS">NPS Contribution (80CCD)</Tip></>}
               type="number"
               value={form.nps}
               onChange={(e) => updateField("nps", e.target.value)}
@@ -175,7 +176,7 @@ export default function TaxPage() {
               </Card>
               <Card>
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                  80C Utilized
+                  <Tip term="80C">80C Utilized</Tip>
                 </p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
                   {fmt(used80C)}

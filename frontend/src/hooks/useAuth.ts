@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { api, apiLogin, setTokens, clearToken } from "@/lib/api";
 import type { User } from "@/types";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const fetchUser = useCallback(async () => {
     try {
@@ -57,6 +59,7 @@ export function useAuth() {
   const logout = () => {
     clearToken();
     setUser(null);
+    router.push("/login");
   };
 
   return { user, loading, login, register, logout };

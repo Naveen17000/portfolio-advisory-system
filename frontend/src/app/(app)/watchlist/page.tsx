@@ -6,6 +6,7 @@ import { downloadCSV } from "@/lib/export";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
+import Tip from "@/components/ui/Tooltip";
 
 interface StockMetrics {
   ticker: string;
@@ -315,19 +316,19 @@ export default function WatchlistPage() {
                       Sector
                     </th>
                     <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">
-                      Beta
+                      <Tip term="Beta">Beta</Tip>
                     </th>
                     <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">
-                      Volatility
+                      <Tip term="Volatility">Volatility</Tip>
                     </th>
                     <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">
-                      Annual Return
+                      <Tip term="Annualized Return">Annual Return</Tip>
                     </th>
                     <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">
-                      Sharpe
+                      <Tip term="Sharpe Ratio">Sharpe</Tip>
                     </th>
                     <th className="text-right py-2 px-2 font-medium text-gray-500 dark:text-gray-400">
-                      Risk Score
+                      <Tip term="Risk Score">Risk Score</Tip>
                     </th>
                     <th className="text-center py-2 px-2 font-medium text-gray-500 dark:text-gray-400">
                       Status

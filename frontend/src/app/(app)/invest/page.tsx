@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import Card from "@/components/ui/Card";
 import { CardSkeleton } from "@/components/ui/Skeleton";
+import Tip from "@/components/ui/Tooltip";
 
 interface Fund {
   name: string;
@@ -154,7 +155,7 @@ export default function InvestPage() {
         </Card>
         <Card>
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-            Recommended SIP
+            Recommended <Tip term="SIP">SIP</Tip>
           </p>
           <p className="text-2xl font-bold text-violet-600 dark:text-violet-400 mt-1">
             {fmt(data.total_recommended_sip)}/mo
@@ -185,7 +186,7 @@ export default function InvestPage() {
       </Card>
 
       {/* SIP Breakdown */}
-      <Card title="Where to Invest — Monthly SIP Breakdown">
+      <Card title={<>Where to Invest — Monthly <Tip term="SIP">SIP</Tip> Breakdown</>}>
         <div className="space-y-4">
           {data.sip_breakdown.map((item) => (
             <div
@@ -234,7 +235,7 @@ export default function InvestPage() {
                       </div>
                       {fund.expense_ratio > 0 && (
                         <span className="text-xs text-gray-400 dark:text-gray-500">
-                          {fund.expense_ratio}% ER
+                          <Tip term="Expense Ratio">{fund.expense_ratio}% ER</Tip>
                         </span>
                       )}
                     </div>
