@@ -27,7 +27,7 @@ from app.routers import simulation, goals, sentiment, explainability, stocks
 from app.routers import chat, nudges, benchmark
 from app.routers import upload, instruments, bl_optimizer, spending, sip_tracker
 from app.routers import report, what_if, model_benchmark_router, rebalance, frontier, stress_test_router, tax, retirement, compounding
-from app.routers import gdpr, invest
+from app.routers import gdpr, invest, life_events, financial_dna
 
 # ── Logging ──────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -123,6 +123,8 @@ app.include_router(retirement.router, prefix="/api/v1/retirement", tags=["Retire
 app.include_router(compounding.router, prefix="/api/v1/compounding", tags=["Compounding"])
 app.include_router(gdpr.router, prefix="/api/v1/account", tags=["Account/GDPR"])
 app.include_router(invest.router, prefix="/api/v1/invest", tags=["Investment Recommendations"])
+app.include_router(life_events.router, prefix="/api/v1/life-events", tags=["Life Event Simulator"])
+app.include_router(financial_dna.router, prefix="/api/v1/financial-dna", tags=["Financial DNA"])
 
 
 # ── Health ───────────────────────────────────────────────────────────

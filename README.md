@@ -1,6 +1,6 @@
 # AI-Driven Investment Risk Profiling & Portfolio Advisory System
 
-An intelligent financial advisory platform that delivers highly personalized investment guidance by integrating behavioral intelligence, explainable AI, financial modeling, and real-time market insights. Built as a full-stack application with **34 interactive pages**, **50 API endpoints**, **30 backend services**, **22 components**, **92 tests**, and production-ready infrastructure.
+An intelligent financial advisory platform that delivers highly personalized investment guidance by integrating behavioral intelligence, explainable AI, financial modeling, and real-time market insights. Built as a full-stack application with **36 interactive pages**, **55+ API endpoints**, **32 backend services**, **24 components**, **92 tests**, and production-ready infrastructure.
 
 ## Features
 
@@ -34,6 +34,8 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Peer Benchmarking** - Anonymized comparison against life-stage cohorts across 6 metrics (savings rate, spending ratio, emergency fund, debt-to-income, risk score, investment diversity) with percentile rankings and cohort allocation benchmarks
 
 ### Phase 4 - Enhanced Analytics & Production Readiness
+- **Financial DNA (Investor Personality Profiling)** - Classifies users into 6 investor archetypes (Shield Bearer, Steady Grower, Growth Hunter, Cautious Planner, Fresh Starter, Balanced Warrior) based on 6 behavioral axes: Discipline, Growth Mindset, Defense, Knowledge, Patience, and Diversification. Each axis scored 0-100 from actual financial data. Generates a visual DNA card with radar chart, archetype description, strengths with insights, weaknesses with actionable improvement steps, personalized behavioral insights, and famous investor philosophy match. Like MBTI for investing — no Indian fintech platform does personality-based financial profiling
+- **Life Event Simulator** - Plan how major life events (marriage, baby, house purchase, car, job loss, salary hike, higher education, child education, parents' medical emergency, starting a business) cascade through your finances over 20 years. Shows baseline vs with-events net worth projection, per-event impact breakdown (one-time costs, monthly savings impact, new liabilities), and actionable tips for each event. Events compound — having a baby AFTER buying a house shows different impact than either alone
 - **What-If Scenario Analysis** - Interactive sliders to modify income, expenses, liabilities, horizon, and life stage with real-time risk score and portfolio allocation impact
 - **Model Benchmarking** - Side-by-side comparison of ML vs rule-based scoring across benchmark profiles, with agreement metrics, feature importance charts, and model info
 - **Efficient Frontier Visualization** - 500-portfolio Monte Carlo frontier with optimal (max Sharpe) and minimum variance portfolios highlighted, plus individual asset class risk-return plot
@@ -128,7 +130,7 @@ portfolio-advisory-system/
 │   │       ├── test_risk_engine.py
 │   │       └── test_portfolio_engine.py
 │   └── app/
-│       ├── main.py                 # App entry, lifespan, middleware, 30 routers
+│       ├── main.py                 # App entry, lifespan, middleware, 31 routers
 │       ├── config.py               # Environment settings (13 variables)
 │       ├── database.py             # Async SQLAlchemy engine & session
 │       ├── dependencies.py         # get_db, get_current_user (JWT)
@@ -149,7 +151,7 @@ portfolio-advisory-system/
 │       │
 │       ├── schemas/                # Pydantic request/response schemas (10 files)
 │       │
-│       ├── routers/                # API route handlers (30 routers)
+│       ├── routers/                # API route handlers (31 routers)
 │       │   ├── auth.py             # Register, login, refresh, me
 │       │   ├── profile.py          # Financial profile CRUD
 │       │   ├── questionnaire.py    # Adaptive questionnaire
@@ -178,9 +180,11 @@ portfolio-advisory-system/
 │       │   ├── retirement.py       # Retirement readiness
 │       │   ├── compounding.py      # Compounding calculator
 │       │   ├── invest.py            # Investment recommendations
+│       │   ├── life_events.py      # Life event simulator
+│       │   ├── financial_dna.py    # Investor personality profiling
 │       │   └── gdpr.py             # GDPR data export & account deletion
 │       │
-│       ├── services/               # Business logic (30 services)
+│       ├── services/               # Business logic (32 services)
 │       │   ├── auth_service.py     # Password hashing, JWT access + refresh tokens
 │       │   ├── profile_service.py  # Profile CRUD operations
 │       │   ├── questionnaire_service.py  # Question definitions
@@ -208,6 +212,9 @@ portfolio-advisory-system/
 │       │   ├── retirement_planner.py  # Retirement readiness calculator
 │       │   ├── compounding_calc.py # Compounding & DCA calculator
 │       │   ├── report_generator.py # HTML report generation
+│       │   ├── life_event_simulator.py # Life event financial impact simulation
+│       │   ├── financial_dna.py   # Investor personality profiling engine
+│       │   ├── stock_search.py    # NSE stock search (200+ stocks)
 │       │   └── audit_service.py   # Audit trail logging service
 │       │
 │       ├── utils/
@@ -216,7 +223,7 @@ portfolio-advisory-system/
 │       ├── ml_models/              # Trained model artifacts (.joblib)
 │       └── market_cache/           # Cached yfinance data (24h TTL)
 │
-└── frontend/                       # Next.js TypeScript frontend (34 pages)
+└── frontend/                       # Next.js TypeScript frontend (36 pages)
     ├── Dockerfile                  # Development Dockerfile
     ├── Dockerfile.prod             # Production multi-stage build (standalone)
     ├── .dockerignore
@@ -239,6 +246,8 @@ portfolio-advisory-system/
         │   ├── portfolio/          # Portfolio allocation details
         │   ├── instruments/        # Suggested funds & stock picks
         │   ├── invest/            # Personalized investment recommendations
+        │   ├── financial-dna/     # Investor personality profiling (6-axis DNA)
+        │   ├── life-events/       # Life event simulator (11 events)
         │   ├── simulation/         # Monte Carlo fan chart & scenarios
         │   ├── goals/              # Goal-based planning wizard
         │   ├── spending/           # Spending history & trends
@@ -266,6 +275,7 @@ portfolio-advisory-system/
         ├── components/
         │   ├── ui/                 # Button, Input, Card, Select, ProgressBar, Skeleton
         │   ├── layout/             # AppShell, Sidebar, AuthGuard, ErrorBoundary, ThemeProvider, Toast, CommandPalette, GuidedTour
+│   │                         # Tooltip (glossary with 35+ financial terms)
         │   ├── risk/               # RiskGauge, ScoreBreakdown, RiskCategoryBadge, RiskTimeline
         │   ├── portfolio/          # AllocationPieChart, AllocationTable, ReturnRangeCard
         │   └── simulation/         # FanChart
@@ -384,6 +394,11 @@ cd frontend && npm test
 | GET | `/api/v1/bl-optimize/` | Black-Litterman optimized allocation |
 | GET | `/api/v1/instruments/` | Suggested funds & stocks per asset class |
 | GET | `/api/v1/invest/` | Personalized investment recommendations with SIP breakdown |
+| GET | `/api/v1/financial-dna/` | Investor personality profiling (6-axis DNA + archetype) |
+| GET | `/api/v1/life-events/templates` | Available life event templates (11 events) |
+| POST | `/api/v1/life-events/simulate` | Simulate cascading financial impact of life events |
+| GET | `/api/v1/stocks/search?q=` | Search 200+ NSE stocks by name or ticker |
+| GET | `/api/v1/stocks/recommended` | Personalized stock picks based on risk profile |
 
 ### Intelligence (Phase 2)
 | Method | Endpoint | Description |
@@ -519,13 +534,14 @@ Portfolio resilience is tested against 5 historical crisis scenarios:
 - [x] **Phase 2: Intelligence** - ML risk model, SHAP explainability, Monte Carlo simulation, goal-based planning, SIP tracking, spending history, FinBERT sentiment analysis, stock classification with real market data
 - [x] **Phase 3: Advanced** - Conversational AI chatbot, anomaly detection & nudge engine, peer benchmarking
 - [x] **Phase 4: Enhanced Analytics** - What-if analysis, model benchmarking, efficient frontier, rebalancing, stress testing, tax planning, retirement calculator, compounding calculator, debt payoff planner, report generation, sidebar navigation, dark mode, production infrastructure, CI/CD, comprehensive testing
-- [x] **Phase 5: Enterprise Features** - Command palette (Ctrl+K), stock watchlist, portfolio comparison, CSV export, onboarding flow, settings page, landing page, GDPR compliance (data export + account deletion), audit logging, PWA manifest, SEO metadata, custom 404 page
+- [x] **Phase 5: Enterprise Features** - Command palette (Ctrl+K), stock watchlist with autocomplete search (200+ NSE stocks), portfolio comparison, CSV export, onboarding flow, settings page, landing page, GDPR compliance (data export + account deletion), audit logging, PWA manifest, SEO metadata, custom 404 page
+- [x] **Phase 6: Innovation** - Financial DNA (investor personality profiling with 6-axis radar, 6 archetypes, strengths/weaknesses, famous investor match), Life Event Simulator (11 life events with cascading 20-year financial projections), personalized stock recommendations, beginner-friendly tooltips (35+ financial terms), guided tour, beginner-friendly sidebar labels
 
 ## System Architecture
 
 ```
-Frontend (Next.js 16)               →  34 pages, Recharts visualizations, dark mode
-        ↓                               Sidebar nav, guided tour, command palette, error boundaries
+Frontend (Next.js 16)               →  36 pages, Recharts visualizations, dark mode
+        ↓                               Sidebar nav, guided tour, tooltips, command palette
 API Gateway (FastAPI)               →  55+ endpoints, JWT auth + refresh, CORS, rate limiting
         ↓                               Structured logging, Prometheus metrics
 Middleware Layer:
@@ -533,7 +549,7 @@ Middleware Layer:
 ├── Error Handler                   →  Sanitized responses, validation errors
 └── Rate Limiter                    →  SlowAPI + Redis backend
         ↓
-Service Layer (30 services):
+Service Layer (32 services):
 ├── Authentication                  →  Register, login, JWT access + refresh tokens
 ├── Data Collection                 →  Questionnaire, CSV parser
 ├── Risk Profiling Engine           →  Rule-based + ML hybrid scoring
