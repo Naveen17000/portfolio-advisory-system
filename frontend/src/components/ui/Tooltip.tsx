@@ -73,21 +73,24 @@ interface TipProps {
 export default function Tip({ term, children }: TipProps) {
   const definition = GLOSSARY[term];
   const [show, setShow] = useState(false);
-  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; below: boolean } | null>(null);
   const ref = useRef<HTMLSpanElement>(null);
 
   const handleEnter = useCallback(() => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    const tooltipWidth = 272;
+    const tooltipWidth = 280;
+    const tooltipHeight = 80; // approximate
 
-    // Position above the element, centered
+    // Clamp left to viewport
     let left = rect.left + rect.width / 2 - tooltipWidth / 2;
-    // Clamp to viewport
     left = Math.max(8, Math.min(left, window.innerWidth - tooltipWidth - 8));
-    const top = rect.top - 8; // 8px gap above element, tooltip renders bottom-aligned to this point
 
-    setPos({ top, left });
+    // Show below if not enough space above
+    const below = rect.top < tooltipHeight + 16;
+    const top = below ? rect.bottom + 8 : rect.top - 8;
+
+    setPos({ top, left, below });
     setShow(true);
   }, []);
 
@@ -121,7 +124,15 @@ export default function Tip({ term, children }: TipProps) {
       </span>
       {show && pos && typeof document !== "undefined" && createPortal(
         <div
-          style={{ position: "fixed", top: pos.top, left: pos.left, transform: "translateY(-100%)", width: 272, zIndex: 9999 }}
+          style={{
+            position: "fixed",
+            top: pos.top,
+            left: pos.left,
+            transform: pos.below ? "none" : "translateY(-100%)",
+            width: 280,
+            maxWidth: "calc(100vw - 16px)",
+            zIndex: 9999,
+          }}
           className="px-3 py-2.5 text-xs leading-relaxed text-white bg-gray-900 dark:bg-gray-700 rounded-lg shadow-xl pointer-events-none"
         >
           <span className="font-semibold text-blue-300">{term}:</span>{" "}
