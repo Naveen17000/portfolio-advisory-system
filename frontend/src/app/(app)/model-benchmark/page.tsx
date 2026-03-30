@@ -14,18 +14,26 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-interface ProfileComparison {
-  profile_name: string;
+interface BenchmarkResult {
+  profile: string;
   rule_based_score: number;
-  ml_score: number;
-  blended_score: number;
-  agreement: boolean;
+  ml_score: number | null;
+  blended_score: number | null;
+  rule_category: string;
+  agreement: boolean | null;
+}
+
+interface BlendWeights {
+  rule_based: number;
+  ml: number;
 }
 
 interface BenchmarkMetrics {
-  agreement_rate: number;
-  avg_difference: number;
-  correlation: number;
+  agreement_rate_pct: number | null;
+  avg_score_difference: number | null;
+  max_score_difference: number | null;
+  correlation: number | null;
+  blend_weights: BlendWeights;
 }
 
 interface FeatureImportance {
@@ -34,14 +42,13 @@ interface FeatureImportance {
 }
 
 interface ModelInfo {
-  model_type: string;
-  version: string;
-  trained_at: string;
-  features_used: string[];
+  rule_based: string;
+  ml: string;
+  blending: string;
 }
 
 interface BenchmarkData {
-  comparisons: ProfileComparison[];
+  benchmark_results: BenchmarkResult[];
   metrics: BenchmarkMetrics;
   feature_importance: FeatureImportance[];
   model_info: ModelInfo;
@@ -142,13 +149,13 @@ export default function ModelBenchmarkPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(data.benchmark_results ?? data.comparisons ?? []).map((row, idx) => (
+                    {data.benchmark_results.map((row) => (
                       <tr
-                        key={row.profile ?? row.profile_name ?? idx}
+                        key={row.profile}
                         className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30"
                       >
                         <td className="py-3 px-2 text-gray-900 dark:text-gray-100 font-medium capitalize">
-                          {(row.profile ?? row.profile_name ?? "").replace(/_/g, " ")}
+                          {row.profile.replace(/_/g, " ")}
                         </td>
                         <td className="py-3 px-2 text-right text-gray-700 dark:text-gray-300">
                           {row.rule_based_score.toFixed(1)}
@@ -162,12 +169,14 @@ export default function ModelBenchmarkPage() {
                         <td className="py-3 px-2 text-center">
                           <span
                             className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                              row.agreement
+                              row.agreement === true
                                 ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                                : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                                : row.agreement === false
+                                ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                                : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
                             }`}
                           >
-                            {row.agreement ? "Yes" : "No"}
+                            {row.agreement === true ? "Yes" : row.agreement === false ? "No" : "N/A"}
                           </span>
                         </td>
                       </tr>

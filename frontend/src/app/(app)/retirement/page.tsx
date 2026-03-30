@@ -17,12 +17,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-interface GlidePathPoint {
+interface ProjectionPoint {
   age: number;
   year: number;
   corpus: number;
-  equity_pct: number;
-  debt_pct: number;
+  equity_allocation_pct: number;
+  debt_allocation_pct: number;
 }
 
 interface RetirementResult {
@@ -32,9 +32,17 @@ interface RetirementResult {
   projected_corpus: number;
   shortfall: number;
   additional_sip_needed: number;
-  safe_withdrawal_rate: number;
-  monthly_retirement_income: number;
-  glide_path: GlidePathPoint[];
+  safe_withdrawal_4pct_monthly: number;
+  safe_withdrawal_3pct_monthly: number;
+  years_to_retire: number;
+  years_in_retirement: number;
+  future_monthly_expense: number;
+  projections: ProjectionPoint[];
+  assumptions: {
+    expected_return_pct: number;
+    inflation_rate_pct: number;
+    life_expectancy: number;
+  };
 }
 
 function fmt(n: number): string {
@@ -150,11 +158,11 @@ export default function RetirementPage() {
     }
   };
 
-  const chartData = result?.glide_path.map((p) => ({
+  const chartData = result?.projections.map((p) => ({
     age: p.age,
     corpus: Math.round(p.corpus),
-    equity: p.equity_pct,
-    debt: p.debt_pct,
+    equity: p.equity_allocation_pct,
+    debt: p.debt_allocation_pct,
   }));
 
   return (
@@ -253,7 +261,7 @@ export default function RetirementPage() {
                   Retirement Readiness Grade
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Safe withdrawal rate: {result.safe_withdrawal_rate}%
+                  Safe withdrawal: {fmt(result.safe_withdrawal_4pct_monthly)}/mo at 4% rate
                 </p>
               </Card>
             </div>
@@ -395,10 +403,13 @@ export default function RetirementPage() {
                   Estimated Monthly Retirement Income
                 </p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">
-                  {fmt(result.monthly_retirement_income)}
+                  {fmt(result.safe_withdrawal_4pct_monthly)}
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Based on {result.safe_withdrawal_rate}% safe withdrawal rate from projected corpus
+                  Based on 4% safe withdrawal rate from projected corpus
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                  Conservative (3%): {fmt(result.safe_withdrawal_3pct_monthly)}/mo
                 </p>
               </div>
             </Card>

@@ -11,6 +11,7 @@ class Question(BaseModel):
     step: int
     text: str
     type: str  # "number", "select", "multi_select"
+    hint: str = ""  # Beginner-friendly explanation shown below the question
     options: list[QuestionOption] = []
     required: bool = True
     show_if: dict | None = None  # {"field": "value"} conditional

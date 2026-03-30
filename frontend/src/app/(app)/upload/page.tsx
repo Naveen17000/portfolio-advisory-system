@@ -131,7 +131,7 @@ export default function UploadPage() {
                         <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div
                             className="bg-blue-500 h-2 rounded-full"
-                            style={{ width: `${Math.min(100, (amount / result.summary.total_expenses) * 100)}%` }}
+                            style={{ width: `${result.summary.total_expenses > 0 ? Math.min(100, (amount / result.summary.total_expenses) * 100) : 0}%` }}
                           />
                         </div>
                         <span className="text-sm font-medium w-16 text-right text-gray-900 dark:text-gray-100">{fmt(amount)}</span>

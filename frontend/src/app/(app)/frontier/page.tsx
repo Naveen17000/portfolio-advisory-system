@@ -94,7 +94,7 @@ export default function FrontierPage() {
       }))
     : [];
 
-  const optimalPoint = frontier
+  const optimalPoint = frontier?.optimal_portfolio
     ? {
         x: +frontier.optimal_portfolio.volatility.toFixed(2),
         y: +frontier.optimal_portfolio.return.toFixed(2),
@@ -102,7 +102,7 @@ export default function FrontierPage() {
       }
     : null;
 
-  const minVarPoint = frontier
+  const minVarPoint = frontier?.min_variance_portfolio
     ? {
         x: +frontier.min_variance_portfolio.volatility.toFixed(2),
         y: +frontier.min_variance_portfolio.return.toFixed(2),
@@ -281,7 +281,7 @@ export default function FrontierPage() {
                 <thead>
                   <tr>
                     <th className="py-2 px-2 text-left text-gray-600 dark:text-gray-400" />
-                    {(correlation.labels ?? correlation.assets).map((a) => (
+                    {(correlation.labels ?? correlation.assets ?? []).map((a) => (
                       <th
                         key={a}
                         className="py-2 px-2 text-center text-gray-600 dark:text-gray-400 font-medium capitalize"
@@ -292,22 +292,22 @@ export default function FrontierPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(correlation.labels ?? correlation.assets).map((rowAsset, i) => {
-                    const row = correlation.matrix[i];
-                    const labels = correlation.labels ?? correlation.assets;
+                  {(correlation.labels ?? correlation.assets ?? []).map((rowAsset, i) => {
+                    const row = correlation.matrix?.[i];
+                    const labels = correlation.labels ?? correlation.assets ?? [];
                     return (
                     <tr key={rowAsset}>
                       <td className="py-2 px-2 text-gray-700 dark:text-gray-300 font-medium capitalize whitespace-nowrap">
                         {rowAsset.replace(/_/g, " ")}
                       </td>
                       {labels.map((colAsset, j) => {
-                        const val = Array.isArray(row) ? row[j] : (row?.correlations?.[colAsset] ?? 0);
+                        const val = Array.isArray(row) ? (row[j] ?? 0) : (row?.correlations?.[colAsset] ?? 0);
                         return (
                         <td key={j} className="py-2 px-1 text-center">
                           <div
                             className={`rounded px-2 py-1 font-mono ${getCorrelationColor(val)} ${getCorrelationTextColor(val)}`}
                           >
-                            {val.toFixed(2)}
+                            {(typeof val === "number" ? val : 0).toFixed(2)}
                           </div>
                         </td>
                         );

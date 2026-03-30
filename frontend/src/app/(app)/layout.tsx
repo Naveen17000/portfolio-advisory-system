@@ -3,6 +3,7 @@
 import AuthGuard from "@/components/layout/AuthGuard";
 import ErrorBoundary from "@/components/layout/ErrorBoundary";
 import Sidebar from "@/components/layout/Sidebar";
+import GuidedTour from "@/components/layout/GuidedTour";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,6 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {children}
           </main>
         </ErrorBoundary>
+        <GuidedTour />
       </div>
     </AuthGuard>
   );

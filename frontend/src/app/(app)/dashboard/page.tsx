@@ -24,7 +24,7 @@ interface NudgesResponse {
   health_score: number;
   nudges: Nudge[];
   tone: string;
-  micro_wins: string[];
+  micro_wins: { type: string; category: string; message: string }[];
   summary: {
     spending_ratio: number;
     savings_ratio: number;
@@ -339,6 +339,35 @@ export default function DashboardPage() {
                       </p>
                       <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                         Impact: {nudge.impact_score}/10
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── Micro Wins ────────────────────────────────────── */}
+            {nudges?.micro_wins && nudges.micro_wins.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  Micro Wins
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {nudges.micro_wins.map((win, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 p-4"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                          {win.category}
+                        </span>
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+                          {win.type}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                        {win.message}
                       </p>
                     </div>
                   ))}

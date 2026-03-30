@@ -19,12 +19,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-interface YearlyBreakdown {
+interface GrowthPoint {
   year: number;
-  total_invested: number;
+  invested: number;
   value: number;
   real_value: number;
-  interest_earned: number;
 }
 
 interface CompoundingResult {
@@ -32,8 +31,10 @@ interface CompoundingResult {
   total_invested: number;
   wealth_gain: number;
   growth_multiplier: number;
-  real_final_value: number;
-  yearly_breakdown: YearlyBreakdown[];
+  real_value_after_inflation: number;
+  cagr_pct: number;
+  inflation_adjusted_return_pct: number;
+  combined_growth: GrowthPoint[];
 }
 
 function fmt(n: number): string {
@@ -81,9 +82,9 @@ export default function CalculatorPage() {
     }
   };
 
-  const chartData = result?.yearly_breakdown.map((y) => ({
+  const chartData = result?.combined_growth.map((y) => ({
     year: `Yr ${y.year}`,
-    invested: Math.round(y.total_invested),
+    invested: Math.round(y.invested),
     value: Math.round(y.value),
     realValue: Math.round(y.real_value),
   }));
@@ -348,7 +349,7 @@ export default function CalculatorPage() {
                         Portfolio Value
                       </th>
                       <th className="text-right py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">
-                        Interest Earned
+                        Wealth Gain
                       </th>
                       <th className="text-right py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">
                         Real Value
@@ -356,7 +357,7 @@ export default function CalculatorPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {result.yearly_breakdown.map((row) => (
+                    {result.combined_growth.map((row) => (
                       <tr
                         key={row.year}
                         className="border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30"
@@ -365,13 +366,13 @@ export default function CalculatorPage() {
                           {row.year}
                         </td>
                         <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
-                          {fmt(row.total_invested)}
+                          {fmt(row.invested)}
                         </td>
                         <td className="py-2 px-3 text-right font-medium text-green-600 dark:text-green-400">
                           {fmt(row.value)}
                         </td>
                         <td className="py-2 px-3 text-right text-purple-600 dark:text-purple-400">
-                          {fmt(row.interest_earned)}
+                          {fmt(row.value - row.invested)}
                         </td>
                         <td className="py-2 px-3 text-right text-orange-600 dark:text-orange-400">
                           {fmt(row.real_value)}

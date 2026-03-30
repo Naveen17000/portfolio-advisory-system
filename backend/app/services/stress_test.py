@@ -100,28 +100,37 @@ def run_stress_test(allocations: list, portfolio_value: float = 1000000) -> dict
         loss_amount = round(portfolio_value * portfolio_impact / 100, 0)
 
         results.append({
-            "scenario": scenario["name"],
+            "name": scenario["name"],
             "description": scenario["description"],
-            "portfolio_impact_pct": round(portfolio_impact, 2),
-            "portfolio_loss_amount": loss_amount,
+            "impact_pct": round(portfolio_impact, 2),
+            "loss_amount": loss_amount,
             "post_crisis_value": round(portfolio_value + loss_amount, 0),
             "duration_months": scenario["duration_months"],
             "recovery_months": scenario["recovery_months"],
-            "asset_impacts": sorted(asset_impacts, key=lambda a: a["contribution_pct"]),
+            "asset_impacts": sorted(
+                [{"asset": a["asset_class"], "impact_pct": a["asset_impact_pct"]} for a in asset_impacts],
+                key=lambda a: a["impact_pct"],
+            ),
         })
 
-    worst = min(results, key=lambda r: r["portfolio_impact_pct"])
-    best = max(results, key=lambda r: r["portfolio_impact_pct"])
-    avg_impact = sum(r["portfolio_impact_pct"] for r in results) / len(results)
+    worst = min(results, key=lambda r: r["impact_pct"])
+    best = max(results, key=lambda r: r["impact_pct"])
+    avg_impact = sum(r["impact_pct"] for r in results) / len(results)
+    avg_loss = round(portfolio_value * avg_impact / 100, 0)
 
     return {
-        "scenarios": results,
-        "summary": {
-            "worst_case": worst["scenario"],
-            "worst_impact_pct": worst["portfolio_impact_pct"],
-            "best_case": best["scenario"],
-            "best_impact_pct": best["portfolio_impact_pct"],
-            "average_impact_pct": round(avg_impact, 2),
-            "portfolio_value": portfolio_value,
+        "portfolio_value": portfolio_value,
+        "worst_case": {
+            "impact_pct": worst["impact_pct"],
+            "loss_amount": worst["loss_amount"],
         },
+        "best_case": {
+            "impact_pct": best["impact_pct"],
+            "loss_amount": best["loss_amount"],
+        },
+        "average_impact": {
+            "impact_pct": round(avg_impact, 2),
+            "loss_amount": avg_loss,
+        },
+        "scenarios": results,
     }

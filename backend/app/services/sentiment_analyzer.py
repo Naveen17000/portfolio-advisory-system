@@ -27,14 +27,16 @@ def _get_pipeline():
 # Financial news RSS feeds
 RSS_FEEDS = {
     "general": [
-        "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^NSEI&region=IN&lang=en-US",
         "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
+        "https://www.moneycontrol.com/rss/marketreports.xml",
     ],
     "equity": [
-        "https://feeds.finance.yahoo.com/rss/2.0/headline?s=^NSEI&region=IN&lang=en-US",
+        "https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2146842.cms",
+        "https://www.moneycontrol.com/rss/marketreports.xml",
     ],
     "commodities": [
-        "https://feeds.finance.yahoo.com/rss/2.0/headline?s=GC=F&region=US&lang=en-US",
+        "https://www.moneycontrol.com/rss/commodities.xml",
+        "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
     ],
 }
 

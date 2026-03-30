@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/risk", label: "Risk" },
   { href: "/explain", label: "XAI" },
   { href: "/portfolio", label: "Portfolio" },
+  { href: "/invest", label: "Invest" },
   { href: "/instruments", label: "Instruments" },
   { href: "/simulation", label: "Simulation" },
   { href: "/goals", label: "Goals" },
@@ -18,7 +19,6 @@ const NAV_LINKS = [
   { href: "/stocks", label: "Stocks" },
   { href: "/chat", label: "Chat" },
   { href: "/nudges", label: "Nudges" },
-  { href: "/achievements", label: "Achievements" },
   { href: "/benchmarks", label: "Benchmarks" },
   { href: "/profile", label: "Profile" },
 ];

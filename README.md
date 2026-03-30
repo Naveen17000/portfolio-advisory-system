@@ -5,13 +5,14 @@ An intelligent financial advisory platform that delivers highly personalized inv
 ## Features
 
 ### Phase 1 - Core Platform
-- **Adaptive Questionnaire** - 6-step financial profiling (income, expenses, liabilities, emergency fund, investment experience, risk attitude) with conditional logic
+- **Adaptive Questionnaire** - 6-step financial profiling (income, expenses, liabilities, emergency fund, investment experience, risk attitude) with conditional logic, beginner-friendly hints on every question, step headers with context, and radio-button style selectors. Questions use plain language with real-world examples (e.g., "Imagine you invested Rs. 1,00,000 and it dropped to Rs. 80,000") instead of jargon
 - **Bank Statement Parsing** - CSV upload supporting 8+ bank formats: separate debit/credit columns, single amount with +/- signs, amount with Cr/Dr suffix, Type column (CR/DR), parenthesized negatives, Indian comma notation (₹50,000.00), Rs/INR prefixes. Auto-categorization of 16 expense types (groceries, dining, transport, utilities, rent, EMI, insurance, investments, shopping, entertainment, healthcare, education, transfers, salary, interest, cashback). Clear error messages for malformed files
 - **Behavioral Risk Scoring** - Rule-based engine with 4 weighted sub-scores: spending ratio (25%), savings consistency (25%), investment discipline (30%), liability burden (20%)
 - **Life-Stage Awareness** - Dynamic adjustments for Student, Early Career, Family, and Pre-Retirement stages with investment horizon modifiers
 - **Portfolio Generation (MPT)** - Modern Portfolio Theory-based asset allocation across 6 classes (Large/Mid/Small Cap Equity, Debt, Gold/Commodities, Liquid Funds) with boundary interpolation
 - **Black-Litterman Optimization** - Bayesian portfolio optimization combining market equilibrium returns with investor views derived from risk profile and market sentiment
 - **Suggested Instruments** - Specific mutual fund and stock recommendations mapped to each asset class allocation, with curated fund database and real-time stock picks
+- **Investment Recommendations** - Personalized "Invest" page showing monthly SIP breakdown per asset class based on income and risk profile, suggested funds with expense ratios, priority action plan (high/medium/low), investable range calculator by life stage, and expected return projections. Includes SEBI-compliant disclaimer
 - **Interactive Dashboard** - KPI strip (health grade, savings rate, emergency fund, risk category, return range), risk gauge, score breakdown charts, allocation pie chart, top priority nudges, and action grid navigation
 - **JWT Authentication** - Secure registration and login with access + refresh token flow, auto-refresh on expiry
 - **Profile Management** - View/edit financial data with one-click re-assessment
@@ -22,15 +23,14 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Monte Carlo Simulation (Fat-Tail + Regime Switching)** - 1,000-path simulation engine using Student-t distribution (df=5) for fat tails and Markov chain regime switching (bull/bear market cycles). Fan chart visualization, 5 scenario outcomes, probability metrics, regime analysis (bull/bear duration and frequency). Uses real historical data from yfinance when available
 - **Goal-Based Planning** - 7 goal templates (emergency fund, education, home, car, vacation, retirement, wealth building) with SIP calculators and 4 SIP scenarios per goal
 - **SIP Adherence Tracking** - Log actual SIP contributions per goal, track adherence percentage, detect missed months, monthly contribution history
-- **Market Sentiment Analysis** - FinBERT (ProsusAI) NLP pipeline analyzing financial news RSS feeds with sector-wise sentiment scoring (8 sectors)
-- **Stock Classification** - Real-time classification of 45 Indian stocks (Nifty 50 + Midcap + Smallcap) as Safe/Moderate/High Risk using beta, volatility, Sharpe ratio, max drawdown, and market cap from Yahoo Finance
+- **Market Sentiment Analysis** - FinBERT (ProsusAI) NLP pipeline analyzing financial news from Economic Times and MoneyControl RSS feeds with sector-wise sentiment scoring (8 sectors)
+- **Personalized Stock Picks** - Analyzes 45+ Indian stocks (Nifty 50 + Midcap + Smallcap) using real-time beta, volatility, Sharpe ratio, max drawdown, and market cap from Yahoo Finance. Stocks are classified as Safe/Moderate/High Risk and then matched to the user's risk profile — conservative users see stable large-caps, aggressive users see growth stocks. Three tabs: Recommended, Worth Exploring, and Use Caution with personalized explanations
 - **Spending History Tracking** - Monthly income/expense logging with trend analysis (improving/declining), savings rate tracking over time, bar chart visualization
-- **Real Market Data** - yfinance integration for historical returns, volatility, and asset class statistics with 24-hour disk caching
+- **Real Market Data** - yfinance (v1.2+) integration for historical returns, volatility, and asset class statistics with 24-hour disk caching
 
 ### Phase 3 - Advanced Features
-- **Conversational AI Assistant (Gemini LLM)** - Google Gemini 2.5 Flash-powered chatbot with SSE streaming (real-time token-by-token responses), persistent conversation history, and full financial context injection (risk score, life stage, income, savings, investment horizon). Provides personalized, conversational investment guidance in English/Hinglish with Indian financial context (80C, ELSS, NPS, PPF, SGB). Falls back to rule-based 12-topic knowledge base if API is unavailable
+- **Conversational AI Assistant (Gemini LLM)** - Google Gemini 2.5 Flash-powered chatbot with SSE streaming (real-time token-by-token responses), persistent conversation history, and full financial context injection (risk score, life stage, income, savings, investment horizon). Provides personalized, conversational investment guidance in English/Hinglish with Indian financial context (80C, ELSS, NPS, PPF, SGB). Falls back to rule-based 18-topic knowledge base if API is unavailable
 - **Anomaly Detection & Behavioral Nudge Engine** - Detects 10 types of financial anomalies including behavioral patterns (lifestyle inflation, cash hoarding, over-concentration, insurance gap), generates impact-scored nudges (0-100) with smart prioritization, micro-wins for positive reinforcement, trend indicators per metric, and overall tone classification (encouraging/mixed/concerning). Health grade A-F
-- **Gamification** - 16 achievements across 6 categories (savings milestones, emergency fund, debt management, diversification, experience, discipline) with a 6-level progression system (Beginner to Master Investor)
 - **Peer Benchmarking** - Anonymized comparison against life-stage cohorts across 6 metrics (savings rate, spending ratio, emergency fund, debt-to-income, risk score, investment diversity) with percentile rankings and cohort allocation benchmarks
 
 ### Phase 4 - Enhanced Analytics & Production Readiness
@@ -47,9 +47,9 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **PDF Report Generation** - Downloadable HTML report with risk profile, financial summary, and portfolio allocation details
 - **Risk Score Timeline** - Area chart showing risk score changes over time with conservative/moderate/aggressive zone markers
 - **Portfolio Comparison** - Side-by-side comparison of current vs alternative portfolio allocations with pie charts and difference table
-- **Stock Watchlist** - Add/remove tickers, fetch live metrics (beta, volatility, Sharpe ratio, sector), localStorage persistence
+- **Stock Watchlist** - Search 70+ Indian stocks by name or ticker with autocomplete dropdown (Nifty 50 + midcap + smallcap), fetch live metrics (beta, volatility, Sharpe ratio, sector), auto-append `.NS` suffix for NSE tickers, localStorage persistence
 - **CSV Data Export** - Reusable CSV export utility for spending data, watchlist, portfolio allocations, and more
-- **Onboarding Welcome Flow** - 6-step animated feature tour for new users with progress dots and keyboard navigation
+- **Guided Tour for New Users** - 12-step interactive guided tour that automatically appears for first-time users, highlighting each sidebar section (Dashboard, Health Check, AI Advisor, Risk Profile, Portfolio, Stress Test, Monte Carlo, Goal Planner, Tax Planner, Market Sentiment, Spending Tracker, Profile) with descriptions and progress tracking. Auto-scrolls sidebar to keep highlighted items visible, with viewport-aware tooltip positioning
 - **Settings & Preferences** - Theme selection, notification toggles, currency preference, account management (password change, data export, account deletion)
 - **Command Palette** - `Ctrl+K` / `Cmd+K` search across all 34 pages with keyboard navigation, grouped by category
 - **Landing Page** - Public marketing page with hero, features grid, stats, how-it-works section
@@ -57,7 +57,7 @@ An intelligent financial advisory platform that delivers highly personalized inv
 - **Audit Logging** - Backend audit trail model tracking user actions (login, data export, account changes)
 
 ### Infrastructure & Quality
-- **Sidebar Navigation** - Grouped into 6 sections (Overview, Analysis, Planning, Market, Tracking, Account) with collapsible sidebar and mobile support
+- **Sidebar Navigation** - Grouped into 6 sections (Overview, Analysis, Planning, Market, Tracking, Account) with collapsible sidebar, mobile support, and guided tour for new users
 - **Dark Mode** - Full dark theme with system preference detection, manual toggle, and localStorage persistence
 - **PWA Support** - Web app manifest for installability with theme colors
 - **Custom 404 Page** - Branded not-found page with navigation links
@@ -167,7 +167,6 @@ portfolio-advisory-system/
 │       │   ├── stocks.py           # Stock classification
 │       │   ├── chat.py             # Conversational AI
 │       │   ├── nudges.py           # Anomaly detection & nudges
-│       │   ├── achievements.py     # Gamification
 │       │   ├── benchmark.py        # Peer benchmarking
 │       │   ├── report.py           # PDF report generation
 │       │   ├── what_if.py          # What-if scenario analysis
@@ -178,6 +177,7 @@ portfolio-advisory-system/
 │       │   ├── tax.py              # Tax planning (India)
 │       │   ├── retirement.py       # Retirement readiness
 │       │   ├── compounding.py      # Compounding calculator
+│       │   ├── invest.py            # Investment recommendations
 │       │   └── gdpr.py             # GDPR data export & account deletion
 │       │
 │       ├── services/               # Business logic (30 services)
@@ -198,7 +198,6 @@ portfolio-advisory-system/
 │       │   ├── shap_explainer.py   # SHAP feature explanations
 │       │   ├── chatbot.py          # Gemini LLM chatbot + SSE streaming + fallback
 │       │   ├── anomaly_detector.py # Financial anomaly detection
-│       │   ├── gamification.py     # Achievement & leveling system
 │       │   ├── peer_benchmark.py   # Cohort comparison engine
 │       │   ├── what_if_engine.py   # What-if scenario analysis
 │       │   ├── model_benchmark.py  # ML vs rule-based benchmarking
@@ -239,6 +238,7 @@ portfolio-advisory-system/
         │   ├── explain/            # SHAP explainability visualization
         │   ├── portfolio/          # Portfolio allocation details
         │   ├── instruments/        # Suggested funds & stock picks
+        │   ├── invest/            # Personalized investment recommendations
         │   ├── simulation/         # Monte Carlo fan chart & scenarios
         │   ├── goals/              # Goal-based planning wizard
         │   ├── spending/           # Spending history & trends
@@ -246,7 +246,6 @@ portfolio-advisory-system/
         │   ├── stocks/             # Stock classification tables
         │   ├── chat/               # AI assistant chatbot
         │   ├── nudges/             # Financial health & action items
-        │   ├── achievements/       # Gamification badges & levels
         │   ├── benchmarks/         # Peer comparison dashboard
         │   ├── profile/            # Edit financial profile
         │   ├── what-if/            # What-if scenario analysis
@@ -266,7 +265,7 @@ portfolio-advisory-system/
         │
         ├── components/
         │   ├── ui/                 # Button, Input, Card, Select, ProgressBar, Skeleton
-        │   ├── layout/             # AppShell, Sidebar, AuthGuard, ErrorBoundary, ThemeProvider, Toast, CommandPalette
+        │   ├── layout/             # AppShell, Sidebar, AuthGuard, ErrorBoundary, ThemeProvider, Toast, CommandPalette, GuidedTour
         │   ├── risk/               # RiskGauge, ScoreBreakdown, RiskCategoryBadge, RiskTimeline
         │   ├── portfolio/          # AllocationPieChart, AllocationTable, ReturnRangeCard
         │   └── simulation/         # FanChart
@@ -384,6 +383,7 @@ cd frontend && npm test
 | GET | `/api/v1/portfolio/history` | All past portfolios |
 | GET | `/api/v1/bl-optimize/` | Black-Litterman optimized allocation |
 | GET | `/api/v1/instruments/` | Suggested funds & stocks per asset class |
+| GET | `/api/v1/invest/` | Personalized investment recommendations with SIP breakdown |
 
 ### Intelligence (Phase 2)
 | Method | Endpoint | Description |
@@ -408,7 +408,6 @@ cd frontend && npm test
 | POST | `/api/v1/chat/stream` | SSE streaming chat (real-time tokens) |
 | GET | `/api/v1/chat/history` | Get conversation history (last 50) |
 | GET | `/api/v1/nudges/` | Financial health check & action items |
-| GET | `/api/v1/achievements/` | Gamification achievements & level |
 | GET | `/api/v1/benchmark/` | Peer benchmarking comparison |
 
 ### Enhanced Analytics (Phase 4)
@@ -518,7 +517,7 @@ Portfolio resilience is tested against 5 historical crisis scenarios:
 
 - [x] **Phase 1: Core** - Questionnaire, CSV parsing, rule-based risk scoring, MPT + Black-Litterman portfolio, instrument recommendations, JWT auth, dashboard
 - [x] **Phase 2: Intelligence** - ML risk model, SHAP explainability, Monte Carlo simulation, goal-based planning, SIP tracking, spending history, FinBERT sentiment analysis, stock classification with real market data
-- [x] **Phase 3: Advanced** - Conversational AI chatbot, anomaly detection & nudge engine, gamification with achievements, peer benchmarking
+- [x] **Phase 3: Advanced** - Conversational AI chatbot, anomaly detection & nudge engine, peer benchmarking
 - [x] **Phase 4: Enhanced Analytics** - What-if analysis, model benchmarking, efficient frontier, rebalancing, stress testing, tax planning, retirement calculator, compounding calculator, debt payoff planner, report generation, sidebar navigation, dark mode, production infrastructure, CI/CD, comprehensive testing
 - [x] **Phase 5: Enterprise Features** - Command palette (Ctrl+K), stock watchlist, portfolio comparison, CSV export, onboarding flow, settings page, landing page, GDPR compliance (data export + account deletion), audit logging, PWA manifest, SEO metadata, custom 404 page
 
@@ -526,7 +525,7 @@ Portfolio resilience is tested against 5 historical crisis scenarios:
 
 ```
 Frontend (Next.js 16)               →  34 pages, Recharts visualizations, dark mode
-        ↓                               Sidebar nav, command palette, error boundaries, toast
+        ↓                               Sidebar nav, guided tour, command palette, error boundaries
 API Gateway (FastAPI)               →  55+ endpoints, JWT auth + refresh, CORS, rate limiting
         ↓                               Structured logging, Prometheus metrics
 Middleware Layer:
@@ -546,7 +545,6 @@ Service Layer (30 services):
 ├── Spending Tracker                →  Monthly snapshots, trends
 ├── Conversational AI               →  Gemini 2.5 Flash LLM + rule-based fallback
 ├── Anomaly Detection               →  10 anomaly types, behavioral nudges, micro-wins
-├── Gamification Service            →  16 achievements, 6 levels
 ├── Benchmarking Service            →  Cohort comparison, percentiles
 ├── What-If Engine                  →  Scenario analysis with modified params
 ├── Model Benchmarking              →  ML vs rule-based comparison

@@ -8,35 +8,36 @@ import Input from "@/components/ui/Input";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 
 interface TaxSlab {
-  range: string;
-  rate: number;
+  slab: string;
+  rate: string;
+  taxable_amount: number;
   tax: number;
 }
 
 interface TaxInstrument {
   name: string;
   section: string;
-  max_limit: number;
-  recommended_amount: number;
-  description: string;
+  lock_in: string;
+  expected_return: string;
+  risk: string;
+  liquidity: string;
 }
 
 interface TaxResult {
   annual_income: number;
+  standard_deduction: number;
+  section_80c_used: number;
+  section_80c_remaining: number;
+  section_80d_used: number;
+  nps_80ccd_used: number;
   taxable_income: number;
+  tax_before_cess: number;
+  cess_4pct: number;
   total_tax: number;
-  effective_rate: number;
-  cess: number;
-  slabs: TaxSlab[];
-  deductions: {
-    section_80c_used: number;
-    section_80c_limit: number;
-    section_80c_remaining: number;
-    section_80d_used: number;
-    nps_used: number;
-    total_deductions: number;
-  };
-  recommendations: TaxInstrument[];
+  effective_rate_pct: number;
+  slab_breakdown: TaxSlab[];
+  tax_saving_instruments: TaxInstrument[];
+  potential_savings: number;
 }
 
 function fmt(n: number): string {
@@ -82,9 +83,10 @@ export default function TaxPage() {
     }
   };
 
-  const used80C = result ? result.deductions.section_80c_used : 0;
+  const used80C = result ? result.section_80c_used : 0;
   const limit80C = 150000;
   const utilization80C = Math.min((used80C / limit80C) * 100, 100);
+  const totalDeductions = result ? result.section_80c_used + result.section_80d_used + result.nps_80ccd_used + result.standard_deduction : 0;
 
   return (
     <>
@@ -157,7 +159,7 @@ export default function TaxPage() {
                   {fmt(result.total_tax)}
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  incl. {fmt(result.cess)} cess
+                  incl. {fmt(result.cess_4pct)} cess
                 </p>
               </Card>
               <Card>
@@ -165,7 +167,7 @@ export default function TaxPage() {
                   Effective Rate
                 </p>
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
-                  {result.effective_rate.toFixed(1)}%
+                  {result.effective_rate_pct.toFixed(1)}%
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                   on {fmt(result.annual_income)}
@@ -187,7 +189,7 @@ export default function TaxPage() {
                   Total Deductions
                 </p>
                 <p className="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">
-                  {fmt(result.deductions.total_deductions)}
+                  {fmt(totalDeductions)}
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                   80C + 80D + NPS
@@ -244,16 +246,16 @@ export default function TaxPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {result.slabs.map((slab, i) => (
+                    {result.slab_breakdown.map((slab, i) => (
                       <tr
                         key={i}
                         className="border-b border-gray-100 dark:border-gray-700/50"
                       >
                         <td className="py-2 px-3 text-gray-700 dark:text-gray-300">
-                          {slab.range}
+                          {slab.slab}
                         </td>
                         <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
-                          {slab.rate}%
+                          {slab.rate}
                         </td>
                         <td className="py-2 px-3 text-right font-medium text-gray-900 dark:text-gray-100">
                           {fmt(slab.tax)}
@@ -272,8 +274,8 @@ export default function TaxPage() {
               </div>
             </Card>
 
-            {/* Tax Saving Recommendations */}
-            {result.recommendations && result.recommendations.length > 0 && (
+            {/* Tax Saving Instruments */}
+            {result.tax_saving_instruments && result.tax_saving_instruments.length > 0 && (
               <Card title="Tax-Saving Instruments">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -285,19 +287,19 @@ export default function TaxPage() {
                         <th className="text-left py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">
                           Section
                         </th>
-                        <th className="text-right py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">
-                          Max Limit
+                        <th className="text-left py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">
+                          Lock-in
                         </th>
-                        <th className="text-right py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">
-                          Recommended
+                        <th className="text-left py-2 px-3 text-gray-500 dark:text-gray-400 font-medium">
+                          Expected Return
                         </th>
                         <th className="text-left py-2 px-3 text-gray-500 dark:text-gray-400 font-medium hidden sm:table-cell">
-                          Description
+                          Risk
                         </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {result.recommendations.map((inst, i) => (
+                      {result.tax_saving_instruments.map((inst, i) => (
                         <tr
                           key={i}
                           className="border-b border-gray-100 dark:border-gray-700/50"
@@ -310,14 +312,14 @@ export default function TaxPage() {
                               {inst.section}
                             </span>
                           </td>
-                          <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
-                            {fmt(inst.max_limit)}
+                          <td className="py-2 px-3 text-gray-700 dark:text-gray-300">
+                            {inst.lock_in}
                           </td>
-                          <td className="py-2 px-3 text-right font-medium text-green-600 dark:text-green-400">
-                            {fmt(inst.recommended_amount)}
+                          <td className="py-2 px-3 text-green-600 dark:text-green-400">
+                            {inst.expected_return}
                           </td>
                           <td className="py-2 px-3 text-gray-500 dark:text-gray-400 hidden sm:table-cell">
-                            {inst.description}
+                            {inst.risk}
                           </td>
                         </tr>
                       ))}

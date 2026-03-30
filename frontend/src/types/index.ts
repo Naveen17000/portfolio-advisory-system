@@ -80,6 +80,7 @@ export interface Question {
   step: number;
   text: string;
   type: string;
+  hint: string;
   options: QuestionOption[];
   required: boolean;
   show_if: Record<string, string> | null;

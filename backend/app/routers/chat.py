@@ -1,5 +1,8 @@
+import asyncio
 import json
 import logging
+import queue
+import threading
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
@@ -166,12 +169,15 @@ async def chat_stream(
 
         return StreamingResponse(fallback_stream(), media_type="text/event-stream")
 
-    # Stream from Gemini
+    # Stream from Gemini using a background thread to avoid blocking the event loop
     user_context = _build_user_context(context)
     system_instruction = SYSTEM_PROMPT.format(user_context=user_context)
 
-    async def event_stream():
-        full_response = ""
+    # Use a thread-safe queue to pass chunks from the blocking Gemini call
+    chunk_queue: queue.Queue[str | None] = queue.Queue()
+
+    def _generate_in_thread():
+        """Run the blocking Gemini streaming call in a separate thread."""
         try:
             genai.configure(api_key=settings.GEMINI_API_KEY)
             model = genai.GenerativeModel(
@@ -179,19 +185,34 @@ async def chat_stream(
                 system_instruction=system_instruction,
                 generation_config=genai.GenerationConfig(
                     temperature=0.7,
-                    max_output_tokens=512,
+                    max_output_tokens=1024,
                 ),
             )
             response = model.generate_content(data.message, stream=True)
             for chunk in response:
                 if chunk.text:
-                    full_response += chunk.text
-                    yield f"data: {json.dumps({'token': chunk.text})}\n\n"
+                    chunk_queue.put(chunk.text)
         except Exception as e:
             logger.error(f"Gemini streaming error: {e}")
             fallback_text = _fallback_response(data.message, context)
-            full_response = fallback_text
-            yield f"data: {json.dumps({'token': fallback_text})}\n\n"
+            chunk_queue.put(fallback_text)
+        finally:
+            chunk_queue.put(None)  # Sentinel to signal completion
+
+    async def event_stream():
+        full_response = ""
+        # Start the blocking Gemini call in a background thread
+        thread = threading.Thread(target=_generate_in_thread, daemon=True)
+        thread.start()
+
+        loop = asyncio.get_event_loop()
+        while True:
+            # Non-blocking read from the queue
+            token = await loop.run_in_executor(None, chunk_queue.get)
+            if token is None:
+                break
+            full_response += token
+            yield f"data: {json.dumps({'token': token})}\n\n"
 
         # Send suggestions
         yield f"data: {json.dumps({'suggestions': suggestions})}\n\n"

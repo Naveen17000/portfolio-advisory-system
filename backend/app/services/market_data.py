@@ -16,15 +16,22 @@ import yfinance as yf
 
 
 class _Timeout:
-    """Context manager for timing out synchronous yfinance calls."""
+    """Context manager for timing out synchronous yfinance calls.
+    Only works in the main thread; gracefully degrades to no-op in worker threads."""
     def __init__(self, seconds=10):
         self.seconds = seconds
+        self._can_use_signal = False
     def __enter__(self):
-        signal.signal(signal.SIGALRM, self._handler)
-        signal.alarm(self.seconds)
+        try:
+            signal.signal(signal.SIGALRM, self._handler)
+            signal.alarm(self.seconds)
+            self._can_use_signal = True
+        except ValueError:
+            pass  # Not in main thread — skip signal-based timeout
         return self
     def __exit__(self, *args):
-        signal.alarm(0)
+        if self._can_use_signal:
+            signal.alarm(0)
     def _handler(self, signum, frame):
         raise TimeoutError("yfinance call timed out")
 
@@ -119,18 +126,21 @@ def fetch_historical_data(ticker: str, period: str = "2y") -> pd.DataFrame | Non
         return pd.DataFrame(cached)
 
     try:
-        with _Timeout(8):
+        with _Timeout(15):
             data = yf.download(ticker, period=period, progress=False, auto_adjust=True)
         if data.empty:
             return None
-        # Flatten MultiIndex columns if present
+        # Flatten MultiIndex columns if present (yfinance >= 1.0)
         if isinstance(data.columns, pd.MultiIndex):
             data.columns = data.columns.get_level_values(0)
+        # Ensure Close column exists
+        if "Close" not in data.columns:
+            return None
         result = data[["Close"]].copy()
         result.index = result.index.strftime("%Y-%m-%d")
         _save_cache(cache_key, result.to_dict())
         return result
-    except (Exception, TimeoutError):
+    except Exception:
         return None
 
 
@@ -184,8 +194,8 @@ def compute_stock_metrics(ticker: str, benchmark_ticker: str = "^NSEI", period: 
         max_drawdown = float(drawdown.min()) * 100
 
         # Get stock info
-        with _Timeout(5):
-            info = yf.Ticker(ticker).info
+        with _Timeout(10):
+            info = yf.Ticker(ticker).info or {}
         market_cap = info.get("marketCap", 0)
         name = info.get("shortName", ticker.replace(".NS", ""))
         sector = info.get("sector", "Unknown")

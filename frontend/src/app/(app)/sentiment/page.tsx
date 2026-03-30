@@ -77,6 +77,21 @@ export default function SentimentPage() {
 
           {loading && (
             <div className="space-y-4" aria-label="Loading sentiment data">
+              <Card className="text-center py-6">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Analyzing market sentiment...
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    Fetching news articles and running FinBERT AI analysis. This may take 15-30 seconds on first load.
+                  </p>
+                </div>
+              </Card>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <CardSkeleton />
                 <CardSkeleton />

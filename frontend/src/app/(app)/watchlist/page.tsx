@@ -25,7 +25,18 @@ interface WatchlistEntry {
   error: string;
 }
 
-const SUGGESTIONS = ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ITC.NS"];
+interface SearchResult {
+  ticker: string;
+  name: string;
+}
+
+const QUICK_ADD = [
+  { ticker: "RELIANCE.NS", name: "Reliance Industries" },
+  { ticker: "TCS.NS", name: "Tata Consultancy Services" },
+  { ticker: "HDFCBANK.NS", name: "HDFC Bank" },
+  { ticker: "INFY.NS", name: "Infosys" },
+  { ticker: "ITC.NS", name: "ITC Ltd" },
+];
 const STORAGE_KEY = "portfolio_watchlist";
 
 function loadWatchlist(): string[] {
@@ -45,6 +56,8 @@ function saveWatchlist(tickers: string[]) {
 export default function WatchlistPage() {
   const [entries, setEntries] = useState<WatchlistEntry[]>([]);
   const [input, setInput] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [initialized, setInitialized] = useState(false);
 
   const fetchMetrics = useCallback(async (ticker: string): Promise<WatchlistEntry> => {
@@ -113,14 +126,42 @@ export default function WatchlistPage() {
     downloadCSV(data, "watchlist");
   };
 
+  // Debounced search via backend API
+  useEffect(() => {
+    if (input.trim().length < 1) {
+      setSearchResults([]);
+      return;
+    }
+    const timer = setTimeout(() => {
+      api<SearchResult[]>(`/api/v1/stocks/search?q=${encodeURIComponent(input.trim())}`)
+        .then((results) => {
+          const existing = new Set(entries.map((e) => e.ticker));
+          setSearchResults(results.filter((r) => !existing.has(r.ticker)));
+        })
+        .catch(() => setSearchResults([]));
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [input, entries]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      addTicker(input);
+      const match = searchResults[0];
+      if (match) {
+        addTicker(match.ticker);
+      } else if (input.trim()) {
+        addTicker(input.includes(".") ? input : input + ".NS");
+      }
+      setShowSuggestions(false);
+    }
+    if (e.key === "Escape") {
+      setShowSuggestions(false);
     }
   };
 
-  const availableSuggestions = SUGGESTIONS.filter(
-    (s) => !entries.some((e) => e.ticker === s)
+  const existingTickers = new Set(entries.map((e) => e.ticker));
+
+  const availableSuggestions = QUICK_ADD.filter(
+    (s) => !existingTickers.has(s.ticker)
   );
 
   if (!initialized) return null;
@@ -149,27 +190,78 @@ export default function WatchlistPage() {
           Track your favorite stocks with real-time metrics from Yahoo Finance
         </p>
 
-        {/* Add ticker input */}
-        <Card className="mb-6">
+        {/* Add ticker input with autocomplete */}
+        <Card className="mb-6 overflow-visible">
           <div className="flex gap-3 items-end">
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <label
                 htmlFor="ticker-input"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
-                Add Ticker
+                Search & Add Stock
               </label>
               <input
                 id="ticker-input"
                 type="text"
-                placeholder="e.g. RELIANCE.NS"
+                placeholder="Type company name or ticker (e.g. Reliance, TCS, HDFC...)"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 onKeyDown={handleKeyDown}
+                autoComplete="off"
                 className="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
+              {/* Autocomplete dropdown */}
+              {showSuggestions && searchResults.length > 0 && (
+                <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+                  {searchResults.map((stock) => (
+                    <button
+                      key={stock.ticker}
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => {
+                        addTicker(stock.ticker);
+                        setShowSuggestions(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors border-b border-gray-100 dark:border-gray-700/50 last:border-b-0"
+                    >
+                      <div>
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {stock.name}
+                        </span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
+                          {stock.ticker}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                        NSE
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Hint when no matches */}
+              {showSuggestions && input.trim().length > 1 && searchResults.length === 0 && (
+                <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl px-3 py-3">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    No matching stock found. Press Enter to add <strong>{input.includes(".") ? input.toUpperCase() : input.toUpperCase() + ".NS"}</strong> as a custom ticker.
+                  </p>
+                </div>
+              )}
             </div>
-            <Button onClick={() => addTicker(input)} disabled={!input.trim()}>
+            <Button
+              onClick={() => {
+                const match = searchResults[0];
+                if (match) addTicker(match.ticker);
+                else if (input.trim()) addTicker(input.includes(".") ? input : input + ".NS");
+                setShowSuggestions(false);
+              }}
+              disabled={!input.trim()}
+            >
               Add
             </Button>
           </div>
@@ -177,17 +269,17 @@ export default function WatchlistPage() {
           {availableSuggestions.length > 0 && (
             <div className="mt-3">
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">
-                Quick add:
+                Popular stocks:
               </p>
               <div className="flex flex-wrap gap-2">
                 {availableSuggestions.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => addTicker(s)}
-                    className="px-3 py-1 text-xs rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                  >
-                    + {s}
-                  </button>
+                    <button
+                      key={s.ticker}
+                      onClick={() => addTicker(s.ticker)}
+                      className="px-3 py-1.5 text-xs rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                    >
+                      + {s.name}
+                    </button>
                 ))}
               </div>
             </div>

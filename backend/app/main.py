@@ -24,10 +24,10 @@ from app.middleware.rate_limiter import limiter, rate_limit_exceeded_handler
 from app.utils.cache import close_redis, get_redis
 from app.routers import auth, profile, questionnaire, risk, portfolio
 from app.routers import simulation, goals, sentiment, explainability, stocks
-from app.routers import chat, nudges, achievements, benchmark
+from app.routers import chat, nudges, benchmark
 from app.routers import upload, instruments, bl_optimizer, spending, sip_tracker
 from app.routers import report, what_if, model_benchmark_router, rebalance, frontier, stress_test_router, tax, retirement, compounding
-from app.routers import gdpr
+from app.routers import gdpr, invest
 
 # ── Logging ──────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -102,7 +102,6 @@ app.include_router(stocks.router, prefix="/api/v1/stocks", tags=["Stocks"])
 # ── Phase 3: Advanced ────────────────────────────────────────────────
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
 app.include_router(nudges.router, prefix="/api/v1/nudges", tags=["Nudges"])
-app.include_router(achievements.router, prefix="/api/v1/achievements", tags=["Achievements"])
 app.include_router(benchmark.router, prefix="/api/v1/benchmark", tags=["Benchmark"])
 
 # ── Additional ───────────────────────────────────────────────────────
@@ -123,6 +122,7 @@ app.include_router(tax.router, prefix="/api/v1/tax", tags=["Tax"])
 app.include_router(retirement.router, prefix="/api/v1/retirement", tags=["Retirement"])
 app.include_router(compounding.router, prefix="/api/v1/compounding", tags=["Compounding"])
 app.include_router(gdpr.router, prefix="/api/v1/account", tags=["Account/GDPR"])
+app.include_router(invest.router, prefix="/api/v1/invest", tags=["Investment Recommendations"])
 
 
 # ── Health ───────────────────────────────────────────────────────────

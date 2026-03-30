@@ -30,19 +30,18 @@ interface WhatIfResult {
 const LIFE_STAGES = [
   "student",
   "early_career",
-  "mid_career",
+  "family",
   "pre_retirement",
-  "retired",
 ];
 
 export default function WhatIfPage() {
   const [form, setForm] = useState({
     monthly_income: 80000,
     monthly_expenses: 40000,
-    liabilities: 200000,
-    emergency_fund: 150000,
-    investment_horizon: 10,
-    life_stage: "mid_career",
+    total_liabilities: 200000,
+    emergency_fund_months: 6,
+    investment_horizon_years: 10,
+    life_stage: "family",
   });
   const [result, setResult] = useState<WhatIfResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,11 +51,30 @@ export default function WhatIfPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await api<WhatIfResult>("/api/v1/what-if/analyze", {
+      const raw = await api<Record<string, Record<string, unknown>>>("/api/v1/what-if/analyze", {
         method: "POST",
         body: JSON.stringify(form),
       });
-      setResult(res);
+      const base = raw.base_scenario;
+      const mod = raw.modified_scenario;
+      const impact = raw.impact;
+      const toAllocMap = (portfolio: Record<string, unknown>): Record<string, number> => {
+        const allocs: Record<string, number> = {};
+        const items = (portfolio as { allocations?: Array<{ asset_class: string; allocation_pct: number }> }).allocations ?? [];
+        for (const a of items) {
+          allocs[a.asset_class] = a.allocation_pct / 100;
+        }
+        return allocs;
+      };
+      setResult({
+        base_score: base.risk_score as number,
+        modified_score: mod.risk_score as number,
+        base_category: base.risk_category as string,
+        modified_category: mod.risk_category as string,
+        score_change: impact.risk_score_change as number,
+        base_allocations: toAllocMap(base.portfolio as Record<string, unknown>),
+        modified_allocations: toAllocMap(mod.portfolio as Record<string, unknown>),
+      });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Analysis failed");
     } finally {
@@ -138,18 +156,18 @@ export default function WhatIfPage() {
             {/* Liabilities */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Liabilities: {form.liabilities.toLocaleString()}
+                Total Liabilities: {form.total_liabilities.toLocaleString()}
               </label>
               <input
                 type="range"
                 min={0}
                 max={5000000}
                 step={50000}
-                value={form.liabilities}
+                value={form.total_liabilities}
                 onChange={(e) =>
                   setForm((f) => ({
                     ...f,
-                    liabilities: Number(e.target.value),
+                    total_liabilities: Number(e.target.value),
                   }))
                 }
                 className="w-full accent-blue-600"
@@ -163,43 +181,43 @@ export default function WhatIfPage() {
             {/* Emergency Fund */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Emergency Fund: {form.emergency_fund.toLocaleString()}
+                Emergency Fund: {form.emergency_fund_months} months
               </label>
               <input
                 type="range"
                 min={0}
-                max={2000000}
-                step={10000}
-                value={form.emergency_fund}
+                max={24}
+                step={1}
+                value={form.emergency_fund_months}
                 onChange={(e) =>
                   setForm((f) => ({
                     ...f,
-                    emergency_fund: Number(e.target.value),
+                    emergency_fund_months: Number(e.target.value),
                   }))
                 }
                 className="w-full accent-blue-600"
               />
               <div className="flex justify-between text-xs text-gray-400 dark:text-gray-500">
-                <span>0</span>
-                <span>20L</span>
+                <span>0 mo</span>
+                <span>24 mo</span>
               </div>
             </div>
 
             {/* Investment Horizon */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Investment Horizon: {form.investment_horizon} years
+                Investment Horizon: {form.investment_horizon_years} years
               </label>
               <input
                 type="range"
                 min={1}
                 max={30}
                 step={1}
-                value={form.investment_horizon}
+                value={form.investment_horizon_years}
                 onChange={(e) =>
                   setForm((f) => ({
                     ...f,
-                    investment_horizon: Number(e.target.value),
+                    investment_horizon_years: Number(e.target.value),
                   }))
                 }
                 className="w-full accent-blue-600"

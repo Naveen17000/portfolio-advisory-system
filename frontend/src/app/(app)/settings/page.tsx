@@ -232,7 +232,8 @@ export default function SettingsPage() {
     setPasswordLoading(true);
     try {
       const token = localStorage.getItem("access_token");
-      const res = await fetch("/api/v1/auth/change-password", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const res = await fetch(`${API_URL}/api/v1/auth/change-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -264,7 +265,8 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      await fetch("/api/v1/auth/delete-account", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      await fetch(`${API_URL}/api/v1/auth/delete-account`, {
         method: "DELETE",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -460,7 +462,7 @@ export default function SettingsPage() {
               </p>
             </div>
             <a
-              href="/api/v1/report/download"
+              href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/report/download`}
               className="inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
               Download Report
